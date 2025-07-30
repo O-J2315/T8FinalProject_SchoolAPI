@@ -1,13 +1,20 @@
 const express = require('express');
 const router = express.Router();
-const { createStudent, updateStudent } = require('../controllers/studentController');
-//const { studentValidationRules, validateStudent } = require('../middlewares/validateStudent');
-//const authenticateJWT = require('../middlewares/authenticateJWT');
+const studentController = require('../controllers/studentController');
 
-// Create new student (POST) — protected route
-router.post('/', studentValidationRules(), validateStudent, createStudent);
+// GET all students (with optional filter)
+router.get('/', studentController.getStudents);
 
-// Update existing student (PUT) — protected route
-router.put('/:studentId', studentValidationRules(), validateStudent, updateStudent);
+// GET single student by studentId
+router.get('/:studentId', studentController.getStudentById);
+
+// POST create a new student
+router.post('/', studentController.createStudent);
+
+// PUT update student by studentId
+router.put('/:studentId', studentController.updateStudent);
+
+// DELETE student by studentId
+router.delete('/:studentId', studentController.deleteStudent);
 
 module.exports = router;

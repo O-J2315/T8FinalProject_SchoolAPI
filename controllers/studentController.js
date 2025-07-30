@@ -1,33 +1,93 @@
 const Student = require('../models/Student');
 
-const createStudent = async (req, res) => {
+// GET all students or filter by status or major
+exports.getStudents = async (req, res) => {
   try {
-    const newStudent = new Student(req.body);
-    const savedStudent = await newStudent.save();
-    res.status(201).json(savedStudent);
-  } catch (err) {
-    if (err.code === 11000) { // duplicate key error
-      return res.status(400).json({ message: 'Duplicate studentId or email' });
-    }
-    res.status(500).json({ message: 'Server error', error: err.message });
+    const { status, major } = req.query;
+    let filter = {};
+    if (status) filter.status = status;
+    if (major) filter.major = major;
+
+    const students = await Student.find(filter);
+    res.json(students);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };
 
-const updateStudent = async (req, res) => {
-  const { studentId } = req.params;
+// GET single student by studentId
+exports.getStudentById = async (req, res) => {
   try {
+    const { studentId } = req.params;
+    const student = await Student.findOne({ studentId });
+    if (!student) return res.status(404).json({ message: "Student not found" });
+    res.json(student);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// POST create a new student
+exports.createStudent = async (req, res) => {
+  try {
+    const {
+      studentId,
+      firstName,
+      lastName,
+      email,
+      major,
+      status,
+      GPA,
+      enrollmentDate,
+      courses
+    } = req.body;
+
+    const newStudent = new Student({
+      studentId,
+      firstName,
+      lastName,
+      email,
+      major,
+      status,
+      GPA,
+      enrollmentDate,
+      courses
+    });
+
+    await newStudent.save();
+    res.status(201).json(newStudent);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+// PUT update existing student by studentId
+exports.updateStudent = async (req, res) => {
+  try {
+    const { studentId } = req.params;
+    const updateData = req.body;
+
     const updatedStudent = await Student.findOneAndUpdate(
       { studentId },
-      req.body,
+      updateData,
       { new: true, runValidators: true }
     );
-    if (!updatedStudent) {
-      return res.status(404).json({ message: 'Student not found' });
-    }
+
+    if (!updatedStudent) return res.status(404).json({ message: "Student not found" });
     res.json(updatedStudent);
-  } catch (err) {
-    res.status(500).json({ message: 'Server error', error: err.message });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
   }
 };
 
-module.exports = { createStudent, updateStudent };
+// DELETE a student by studentId
+exports.deleteStudent = async (req, res) => {
+  try {
+    const { studentId } = req.params;
+    const deletedStudent = await Student.findOneAndDelete({ studentId });
+    if (!deletedStudent) return res.status(404).json({ message: "Student not found" });
+    res.json({ message: "Student deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
