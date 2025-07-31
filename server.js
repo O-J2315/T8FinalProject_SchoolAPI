@@ -1,6 +1,6 @@
 require("dotenv").config();
 const express = require("express");
-const { connectDb } = require("./database/connect");
+const { connectDb } = require("./data/connect");
 const swaggerJsdoc = require("swagger-jsdoc");
 const swaggerUi = require("swagger-ui-express");
 const bodyParser = require("body-parser");

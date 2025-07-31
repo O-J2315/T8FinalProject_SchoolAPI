@@ -11,9 +11,11 @@
     "joi": "^17.13.3",
     "lint": "^0.8.19",
     "mongodb": "^6.18.0",
+    "mongoose": "^8.17.0",
     "nodemon": "^3.1.10",
     "passport": "^0.7.0",
     "passport-github": "^1.1.0",
+    "passport-github2": "^0.1.12",
     "prettier": "^3.6.2",
     "swagg": "^5.0.1",
     "swagger-autogen": "^2.23.7",
@@ -29,14 +31,13 @@
     "mocha": "^2.5.3"
   },
   "scripts": {
-    "test": "mocha" ,
+    "test": "mocha",
     "dev": "nodemon index.js",
     "start": "node server.js",
     "lint": "eslint . --ext .js",
     "lint:fix": "eslint . --fix",
     "prettier": "prettier --write '**/*.{js,json,md}'",
-    "swagger" : "swagger.js"
-
+    "swagger": "node swagger.js"
   },
   "repository": {
     "type": "git",
