@@ -8,23 +8,59 @@ const teacherRoutes = require("./teacher");
 
 const passport = require("passport");
 
-router.use("/", require("./swagger"));
+// Home page route
+router.get("/", (req, res) => {
+    if (req.user && req.session.cookie) {
+        // User is logged in
+        res.json({
+            message: "Welcome to School Management API",
+            user: req.user,
+            endpoints: {
+                courses: "/courses",
+                departments: "/departments",
+                students: "/students",
+                teachers: "/teachers",
+                logout: "/logout",
+                docs: "/api-docs",
+            },
+        });
+    } else {
+        // User is not logged in
+        res.json({
+            message: "Welcome to School Management API",
+            status: "Not logged in",
+            login: "Visit /login to authenticate with GitHub",
+            docs: "/api-docs",
+        });
+    }
+});
 
 router.use("/courses", courseRoutes);
 router.use("/departments", departmentRoutes);
 router.use("/students", studentRoutes);
 router.use("/teachers", teacherRoutes);
 
-//Log in route
-router.get("/login", passport.authenticate("github"), (req, res) => {});
+//Login route
+router.get("/login", passport.authenticate("github"));
+
+// Github OAuth callback route
+router.get(
+    "/auth/github/callback",
+    passport.authenticate("github", {
+        failureRedirect: "/login",
+    }),
+    (req, res) => {
+        res.redirect("/");
+    }
+);
 
 router.get("/logout", (req, res, next) => {
-  req.logout(function (err) {
-    if (err) {
-      return next(err);
-    }
-    res.redirect("/");
-  });
+    req.logout(function (err) {
+        if (err) {
+            return next(err);
+        }
+        res.redirect("/");
+    });
 });
 
 module.exports = router;

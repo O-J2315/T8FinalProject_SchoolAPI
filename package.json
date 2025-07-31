@@ -1,53 +1,55 @@
 {
-  "dependencies": {
-    "cors": "^2.8.5",
-    "dotenv": "^17.2.1",
-    "eslint": "^9.32.0",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-prettier": "^5.5.3",
-    "express": "^5.1.0",
-    "express-session": "^1.18.2",
-    "globals": "^16.3.0",
-    "joi": "^17.13.3",
-    "lint": "^0.8.19",
-    "mongodb": "^6.18.0",
-    "mongoose": "^8.17.0",
-    "nodemon": "^3.1.10",
-    "passport": "^0.7.0",
-    "passport-github": "^1.1.0",
-    "passport-github2": "^0.1.12",
-    "prettier": "^3.6.2",
-    "swagg": "^5.0.1",
-    "swagger-autogen": "^2.23.7",
-    "swagger-jsdoc": "^6.2.8",
-    "swagger-ui-express": "^5.0.1",
-    "yamljs": "^0.3.0"
-  },
-  "name": "t8finalproject_schoolapi",
-  "version": "1.0.0",
-  "description": "team's 8 final project. School management API",
-  "main": "server.js",
-  "devDependencies": {
-    "mocha": "^2.5.3"
-  },
-  "scripts": {
-    "test": "mocha",
-    "dev": "nodemon index.js",
-    "start": "node server.js",
-    "lint": "eslint . --ext .js",
-    "lint:fix": "eslint . --fix",
-    "prettier": "prettier --write '**/*.{js,json,md}'",
-    "swagger": "node swagger.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/O-J2315/T8FinalProject_SchoolAPI.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/O-J2315/T8FinalProject_SchoolAPI/issues"
-  },
-  "homepage": "https://github.com/O-J2315/T8FinalProject_SchoolAPI#readme"
+    "dependencies": {
+        "cors": "^2.8.5",
+        "dotenv": "^17.2.1",
+        "express": "^5.1.0",
+        "express-session": "^1.18.2",
+        "joi": "^17.13.3",
+        "jsonwebtoken": "^9.0.2",
+        "lint": "^0.8.19",
+        "mongodb": "^6.18.0",
+        "mongoose": "^8.17.0",
+        "nodemon": "^3.1.10",
+        "passport": "^0.7.0",
+        "passport-github": "^1.1.0",
+        "passport-github2": "^0.1.12",
+        "swagg": "^5.0.1",
+        "swagger-autogen": "^2.23.7",
+        "swagger-jsdoc": "^6.2.8",
+        "swagger-ui-express": "^5.0.1",
+        "yamljs": "^0.3.0"
+    },
+    "name": "t8finalproject_schoolapi",
+    "version": "1.0.0",
+    "description": "team's 8 final project. School management API",
+    "main": "server.js",
+    "devDependencies": {
+        "@eslint/js": "^9.32.0",
+        "eslint": "^9.32.0",
+        "eslint-config-prettier": "^10.1.8",
+        "eslint-plugin-prettier": "^5.5.3",
+        "globals": "^16.3.0",
+        "mocha": "^2.5.3",
+        "prettier": "^3.6.2"
+    },
+    "scripts": {
+        "test": "mocha",
+        "dev": "nodemon server.js",
+        "start": "node server.js",
+        "lint": "eslint . --ext .js",
+        "lint:fix": "eslint . --fix",
+        "prettier": "prettier --write .",
+        "swagger": "node swagger.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/O-J2315/T8FinalProject_SchoolAPI.git"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/O-J2315/T8FinalProject_SchoolAPI/issues"
+    },
+    "homepage": "https://github.com/O-J2315/T8FinalProject_SchoolAPI#readme"
 }

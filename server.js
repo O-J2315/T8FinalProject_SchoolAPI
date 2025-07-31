@@ -1,98 +1,83 @@
 require("dotenv").config();
 const express = require("express");
-const connectDB = require("./data/connect");
-const swaggerJsdoc = require("swagger-jsdoc");
-const swaggerUi = require("swagger-ui-express");
-const bodyParser = require("body-parser");
-const passport = require("passport");
 const session = require("express-session");
-const GithubStrategy = require("passport-github2").Strategy;
-const cors = require("cors");
+const swaggerUi = require("swagger-ui-express");
+const connectDB = require("./database/connect");
+const corsMiddleware = require("./middleware/cors");
+const passport = require("./config/passport");
 
 const app = express();
+const PORT = process.env.PORT || 3000;
+
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-app
-  .use(bodyParser.urlencoded({ extended: true }))
-  .use(bodyParser.json())
-  .use(
+app.use(corsMiddleware);
+
+// Session config
+app.use(
     session({
-      secret: "secret",
-      resave: false,
-      saveUninitialized: true,
-    }),
-  )
-  .use(passport.initialize())
-  .use(passport.session())
-
-  .use((req, res, next) => {
-    // CORS headers
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader(
-      "Access-Control-Allow-Headers",
-      "Origin, X-Requested-With, Content-Type, Accept, Authorization",
-    );
-    res.setHeader(
-      "Access-Control-Allow-Methods",
-      "GET, POST, PUT, DELETE, OPTIONS",
-    );
-    next();
-  })
-  .use(cors({ methods: "GET, POST, PUT, DELETE, OPTIONS" }))
-  .use(cors("{origin: '*' }"))
-  .use("/", require("./routes")); // Centralized routes
-
-passport.use(
-  new GithubStrategy(
-    {
-      clientID: process.env.GITHUB_CLIENT_ID,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET,
-      callbackURL: process.env.GITHUB_CALLBACK_URL,
-    },
-    (accessToken, refreshToken, profile, done) => {
-      // Here you would typically save the user to your database
-      return done(null, profile);
-    },
-  ),
+        secret: process.env.SESSION_SECRET || "default_secret",
+        resave: false,
+        saveUninitialized: false,
+        cookie: {
+            secure: process.env.NODE_ENV === "production",
+            httpOnly: true,
+            maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
+        },
+    })
 );
 
-passport.serializeUser((user, done) => {
-  done(null, user);
-});
-passport.deserializeUser((user, done) => {
-  done(null, user);
+// Passport middleware
+app.use(passport.initialize());
+app.use(passport.session());
+
+// Swagger setup
+try {
+    const swaggerFile = require("./swagger.json");
+    app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerFile));
+    console.log(
+        "📚 Swagger docs available at http://localhost:" + PORT + "/api-docs"
+    );
+} catch {
+    console.warn(
+        "⚠️  Swagger documentation not available. Run swagger generation first."
+    );
+}
+
+// Routes
+app.use("/", require("./routes"));
+
+// Error handling middleware
+app.use((err, req, res, _next) => {
+    console.error(err.stack);
+    res.status(500).json({
+        error: "Something went wrong!",
+    });
 });
 
-app.get("/", (req, res) => {
-  res.send(
-    req.session.user != undefined
-      ? `Logged in as ${req.session.user.username}`
-      : "Logged out",
-  );
+// 404 handler
+app.use((req, res) => {
+    res.status(404).json({
+        error: "Route not found",
+    });
 });
-
-app.get(
-  "/github/callback",
-  passport.authenticate("github", {
-    failureRedirect: "/apic-docs",
-    session: false,
-  }),
-  (req, res) => {
-    // Successful authentication, redirect home.
-    req.session.user = req.user;
-    res.redirect("/");
-  },
-);
 
 const startServer = async () => {
-  try {
-    await connectDB();
-    app.listen(3000, () => {
-      console.log("🚀 Server running on http://localhost:3000");
-    });
-  } catch (error) {
-    console.error("❌ Error starting server:", error.message);
-  }
+    try {
+        await connectDB();
+        app.listen(PORT, () => {
+            console.log(`🚀 Server running on http://localhost:${PORT}`);
+        });
+    } catch (error) {
+        console.error("❌ Error starting server:", error.message);
+    }
 };
 
-startServer();
+// Export the startServer function so swagger-autogen can call it
+module.exports = { app, startServer };
+
+// Only start server directly if this file is run directly (not required by swagger-autogen)
+if (require.main === module) {
+    startServer();
+}

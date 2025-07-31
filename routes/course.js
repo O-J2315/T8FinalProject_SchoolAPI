@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const courseController = require("../controllers/courseController");
-//const authenticateJWT = require('../middlewares/authenticateJWT');
+//const authenticateJWT = require('../middlewares/jwtAuth');
 
 // GET routes
 router.get("/", courseController.getCourses);
