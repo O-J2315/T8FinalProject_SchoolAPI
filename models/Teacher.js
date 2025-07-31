@@ -11,7 +11,7 @@ const teacherSchema = new mongoose.Schema({
         lowercase: true,
         trim: true,
     },
-    departmentId: { type: String, required: true },
+    deptId: { type: String, required: true },
     courses: [{ type: String }],
 });
 

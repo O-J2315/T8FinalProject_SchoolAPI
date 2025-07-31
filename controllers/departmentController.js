@@ -26,13 +26,13 @@ exports.getDepartmentById = async (req, res) => {
 // POST create new department
 exports.createDepartment = async (req, res) => {
     try {
-        const { deptId, name, location, departmentEmail } = req.body;
+        const { deptId, deptName, location, deptEmail } = req.body;
 
         const newDepartment = new Department({
             deptId,
-            name,
+            deptName,
             location,
-            departmentEmail,
+            deptEmail,
         });
 
         await newDepartment.save();

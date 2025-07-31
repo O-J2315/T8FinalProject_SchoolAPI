@@ -4,13 +4,42 @@ const courseController = require("../controllers/courseController");
 //const authenticateJWT = require('../middlewares/jwtAuth');
 
 // GET routes
-router.get("/", courseController.getCourses);
-router.get("/:courseId", courseController.getCourseById);
+router.get(
+    "/",
+    /*  #swagger.tags = ["Courses"]
+     */
+    courseController.getCourses
+);
+
+router.get(
+    "/:courseId",
+    /*  #swagger.tags = ["Courses"]
+     */
+    courseController.getCourseById
+);
+
 // Post route
-router.post("/", courseController.createCourse);
+router.post(
+    "/",
+    /*  #swagger.tags = ["Courses"]
+     */
+    courseController.createCourse
+);
+
 // Put route
-router.put("/:courseId", courseController.updateCourse);
+router.put(
+    "/:courseId",
+    /*  #swagger.tags = ["Courses"]
+     */
+    courseController.updateCourse
+);
+
 // Delete route
-router.delete("/:courseId", courseController.deleteCourse);
+router.delete(
+    "/:courseId",
+    /*  #swagger.tags = ["Courses"]
+     */
+    courseController.deleteCourse
+);
 
 module.exports = router;

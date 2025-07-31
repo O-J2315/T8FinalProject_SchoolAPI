@@ -3,11 +3,11 @@ const Course = require("../models/Course");
 // GET all
 exports.getCourses = async (req, res) => {
     try {
-        const { teacherId, departmentId } = req.query;
+        const { teacherId, deptId } = req.query;
         let filter = {};
 
         if (teacherId) filter.teacherId = teacherId;
-        if (departmentId) filter.departmentId = departmentId;
+        if (deptId) filter.deptId = deptId;
 
         const courses = await Course.find(filter);
         res.json(courses);

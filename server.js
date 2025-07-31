@@ -34,6 +34,8 @@ app.use(passport.session());
 
 // Swagger setup
 try {
+    // 🧹 Clear require cache for swagger.json before loading
+    delete require.cache[require.resolve("./swagger.json")];
     const swaggerFile = require("./swagger.json");
     app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerFile));
     console.log(

@@ -1,11 +1,11 @@
 const Teacher = require("../models/Teacher");
 
-// GET all teachers or filter by departmentId
+// GET all teachers or filter by deptId
 exports.getTeachers = async (req, res) => {
     try {
-        const { departmentId } = req.query;
+        const { deptId } = req.query;
         const filter = {};
-        if (departmentId) filter.departmentId = departmentId;
+        if (deptId) filter.deptId = deptId;
 
         const teachers = await Teacher.find(filter);
         res.json(teachers);
@@ -30,7 +30,7 @@ exports.getTeacherById = async (req, res) => {
 // POST create new teacher
 exports.createTeacher = async (req, res) => {
     try {
-        const { teacherId, firstName, lastName, email, departmentId, courses } =
+        const { teacherId, firstName, lastName, email, deptId, courses } =
             req.body;
 
         const newTeacher = new Teacher({
@@ -38,7 +38,7 @@ exports.createTeacher = async (req, res) => {
             firstName,
             lastName,
             email,
-            departmentId,
+            deptId,
             courses,
         });
 
