@@ -1,4 +1,4 @@
-const Course = require('../models/Course');
+const Course = require("../models/Course");
 
 // GET all
 exports.getCourses = async (req, res) => {
@@ -49,10 +49,11 @@ exports.updateCourse = async (req, res) => {
     const updatedCourse = await Course.findOneAndUpdate(
       { courseId },
       updateData,
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
 
-    if (!updatedCourse) return res.status(404).json({ message: "Course not found" });
+    if (!updatedCourse)
+      return res.status(404).json({ message: "Course not found" });
     res.json(updatedCourse);
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -64,7 +65,8 @@ exports.deleteCourse = async (req, res) => {
   try {
     const { courseId } = req.params;
     const deletedCourse = await Course.findOneAndDelete({ courseId });
-    if (!deletedCourse) return res.status(404).json({ message: "Course not found" });
+    if (!deletedCourse)
+      return res.status(404).json({ message: "Course not found" });
     res.json({ message: "Course deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });

@@ -1,4 +1,4 @@
-const Teacher = require('../models/Teacher');
+const Teacher = require("../models/Teacher");
 
 // GET all teachers or filter by departmentId
 exports.getTeachers = async (req, res) => {
@@ -29,14 +29,8 @@ exports.getTeacherById = async (req, res) => {
 // POST create new teacher
 exports.createTeacher = async (req, res) => {
   try {
-    const {
-      teacherId,
-      firstName,
-      lastName,
-      email,
-      departmentId,
-      courses
-    } = req.body;
+    const { teacherId, firstName, lastName, email, departmentId, courses } =
+      req.body;
 
     const newTeacher = new Teacher({
       teacherId,
@@ -44,7 +38,7 @@ exports.createTeacher = async (req, res) => {
       lastName,
       email,
       departmentId,
-      courses
+      courses,
     });
 
     await newTeacher.save();
@@ -63,10 +57,11 @@ exports.updateTeacher = async (req, res) => {
     const updatedTeacher = await Teacher.findOneAndUpdate(
       { teacherId },
       updateData,
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
 
-    if (!updatedTeacher) return res.status(404).json({ message: "Teacher not found" });
+    if (!updatedTeacher)
+      return res.status(404).json({ message: "Teacher not found" });
     res.json(updatedTeacher);
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -78,7 +73,8 @@ exports.deleteTeacher = async (req, res) => {
   try {
     const { teacherId } = req.params;
     const deletedTeacher = await Teacher.findOneAndDelete({ teacherId });
-    if (!deletedTeacher) return res.status(404).json({ message: "Teacher not found" });
+    if (!deletedTeacher)
+      return res.status(404).json({ message: "Teacher not found" });
     res.json({ message: "Teacher deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });

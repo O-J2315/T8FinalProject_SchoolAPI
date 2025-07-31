@@ -1,4 +1,4 @@
-const Student = require('../models/Student');
+const Student = require("../models/Student");
 
 // GET all students or filter by status or major
 exports.getStudents = async (req, res) => {
@@ -39,7 +39,7 @@ exports.createStudent = async (req, res) => {
       status,
       GPA,
       enrollmentDate,
-      courses
+      courses,
     } = req.body;
 
     const newStudent = new Student({
@@ -51,7 +51,7 @@ exports.createStudent = async (req, res) => {
       status,
       GPA,
       enrollmentDate,
-      courses
+      courses,
     });
 
     await newStudent.save();
@@ -70,10 +70,11 @@ exports.updateStudent = async (req, res) => {
     const updatedStudent = await Student.findOneAndUpdate(
       { studentId },
       updateData,
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
 
-    if (!updatedStudent) return res.status(404).json({ message: "Student not found" });
+    if (!updatedStudent)
+      return res.status(404).json({ message: "Student not found" });
     res.json(updatedStudent);
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -85,7 +86,8 @@ exports.deleteStudent = async (req, res) => {
   try {
     const { studentId } = req.params;
     const deletedStudent = await Student.findOneAndDelete({ studentId });
-    if (!deletedStudent) return res.status(404).json({ message: "Student not found" });
+    if (!deletedStudent)
+      return res.status(404).json({ message: "Student not found" });
     res.json({ message: "Student deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });

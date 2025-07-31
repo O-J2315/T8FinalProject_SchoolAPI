@@ -1,4 +1,4 @@
-const Department = require('../models/Department');
+const Department = require("../models/Department");
 
 // GET all departments
 exports.getDepartments = async (req, res) => {
@@ -15,7 +15,8 @@ exports.getDepartmentById = async (req, res) => {
   try {
     const { deptId } = req.params;
     const department = await Department.findOne({ deptId });
-    if (!department) return res.status(404).json({ message: "Department not found" });
+    if (!department)
+      return res.status(404).json({ message: "Department not found" });
     res.json(department);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -25,18 +26,13 @@ exports.getDepartmentById = async (req, res) => {
 // POST create new department
 exports.createDepartment = async (req, res) => {
   try {
-    const {
-      deptId,
-      name,
-      location,
-      departmentEmail
-    } = req.body;
+    const { deptId, name, location, departmentEmail } = req.body;
 
     const newDepartment = new Department({
       deptId,
       name,
       location,
-      departmentEmail
+      departmentEmail,
     });
 
     await newDepartment.save();
@@ -55,10 +51,11 @@ exports.updateDepartment = async (req, res) => {
     const updatedDepartment = await Department.findOneAndUpdate(
       { deptId },
       updateData,
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
 
-    if (!updatedDepartment) return res.status(404).json({ message: "Department not found" });
+    if (!updatedDepartment)
+      return res.status(404).json({ message: "Department not found" });
     res.json(updatedDepartment);
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -70,7 +67,8 @@ exports.deleteDepartment = async (req, res) => {
   try {
     const { deptId } = req.params;
     const deletedDepartment = await Department.findOneAndDelete({ deptId });
-    if (!deletedDepartment) return res.status(404).json({ message: "Department not found" });
+    if (!deletedDepartment)
+      return res.status(404).json({ message: "Department not found" });
     res.json({ message: "Department deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });

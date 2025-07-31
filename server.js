@@ -1,6 +1,6 @@
 require("dotenv").config();
 const express = require("express");
-const { connectDb } = require("./data/connect");
+const connectDB = require("./data/connect");
 const swaggerJsdoc = require("swagger-jsdoc");
 const swaggerUi = require("swagger-ui-express");
 const bodyParser = require("body-parser");
@@ -84,8 +84,15 @@ app.get(
   },
 );
 
-connectDb(() => {
-  app.listen(3000, () =>
-    console.log("🚀 Server running on http://localhost:3000"),
-  );
-});
+const startServer = async () => {
+  try {
+    await connectDB();
+    app.listen(3000, () => {
+      console.log("🚀 Server running on http://localhost:3000");
+    });
+  } catch (error) {
+    console.error("❌ Error starting server:", error.message);
+  }
+};
+
+startServer();

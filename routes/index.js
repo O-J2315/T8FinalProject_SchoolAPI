@@ -8,13 +8,12 @@ const teacherRoutes = require("./teacher");
 
 const passport = require("passport");
 
-router.use("/", require("../swagger"));
+router.use("/", require("./swagger"));
 
 router.use("/courses", courseRoutes);
 router.use("/departments", departmentRoutes);
 router.use("/students", studentRoutes);
 router.use("/teachers", teacherRoutes);
-
 
 //Log in route
 router.get("/login", passport.authenticate("github"), (req, res) => {});
