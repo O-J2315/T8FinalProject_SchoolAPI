@@ -13,11 +13,11 @@ router.get(
     "/",
     // #swagger.tags = ["Home"]
     (req, res) => {
-        if (req.user && req.session.cookie) {
+        if (req.session.user !== undefined) {
             // User is logged in
             res.json({
-                message: "Welcome to School Management API",
-                user: req.user,
+                message: `Welcome to School Management API`,
+                user: req.session.user,
                 endpoints: {
                     courses: "/courses",
                     departments: "/departments",
@@ -51,17 +51,17 @@ router.get(
     passport.authenticate("github")
 );
 
-// Github OAuth callback route
-router.get(
-    "/auth/github/callback",
-    // #swagger.ignore = true
-    passport.authenticate("github", {
-        failureRedirect: "/login",
-    }),
-    (req, res) => {
-        res.redirect("/");
-    }
-);
+// // Github OAuth callback route
+// router.get(
+//     "/auth/github/callback",
+//     // #swagger.ignore = true
+//     passport.authenticate("github", {
+//         failureRedirect: "/login",
+//     }),
+//     (req, res) => {
+//         res.redirect("/");
+//     }
+// );
 
 router.get(
     "/logout",

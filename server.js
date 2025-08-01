@@ -5,6 +5,7 @@ const swaggerUi = require("swagger-ui-express");
 const connectDB = require("./data/connect");
 const corsMiddleware = require("./middleware/cors");
 const passport = require("./config/passport");
+const GithubStrategy = require("passport-github2").Strategy;
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -19,7 +20,7 @@ app.use(
     session({
         secret: process.env.SESSION_SECRET || "default_secret",
         resave: false,
-        saveUninitialized: false,
+        saveUninitialized: true,
         cookie: {
             secure: process.env.NODE_ENV === "production",
             httpOnly: true,
@@ -31,6 +32,27 @@ app.use(
 // Passport middleware
 app.use(passport.initialize());
 app.use(passport.session());
+// Initialize Passport
+passport.use(
+    new GithubStrategy(
+        {
+            clientID: process.env.GITHUB_CLIENT_ID,
+            clientSecret: process.env.GITHUB_CLIENT_SECRET,
+            callbackURL: process.env.GITHUB_CALLBACK_URL,
+        },
+        (accessToken, refreshToken, profile, done) => {
+            // Here you would typically save the user to your database
+            return done(null, profile);
+        }
+    )
+);
+
+passport.serializeUser((user, done) => {
+    done(null, user);
+});
+passport.deserializeUser((user, done) => {
+    done(null, user);
+});
 
 // Swagger setup
 try {
@@ -57,6 +79,17 @@ app.use((err, req, res, _next) => {
         error: "Something went wrong!",
     });
 });
+
+// GitHub OAuth callback route
+app.get(
+    "/github/callback",
+    passport.authenticate("github", {
+        failureRedirect: "/apic-docs",
+    }),
+    (req, res) => {
+        res.redirect("/");
+    }
+);
 
 // 404 handler
 app.use((req, res) => {
