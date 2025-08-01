@@ -82,7 +82,7 @@ app.use((err, req, res, _next) => {
 
 // GitHub OAuth callback route
 app.get(
-    "/github/callback",
+    "/auth/github/callback",
     passport.authenticate("github", {
         failureRedirect: "/apic-docs",
     }),

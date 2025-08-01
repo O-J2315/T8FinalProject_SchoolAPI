@@ -51,17 +51,6 @@ router.get(
     passport.authenticate("github")
 );
 
-// // Github OAuth callback route
-// router.get(
-//     "/auth/github/callback",
-//     // #swagger.ignore = true
-//     passport.authenticate("github", {
-//         failureRedirect: "/login",
-//     }),
-//     (req, res) => {
-//         res.redirect("/");
-//     }
-// );
 
 router.get(
     "/logout",
