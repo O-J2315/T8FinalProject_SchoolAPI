@@ -18,9 +18,9 @@ app.use(corsMiddleware);
 // Session config
 app.use(
     session({
-        secret: process.env.SESSION_SECRET || "default_secret",
+        secret: process.env.SESSION_SECRET || "secret",
         resave: false,
-        saveUninitialized: true,
+        saveUninitialized: false,
         cookie: {
             secure: process.env.NODE_ENV === "production",
             httpOnly: true,
@@ -28,6 +28,13 @@ app.use(
         },
     })
 );
+
+passport.serializeUser((user, done) => {
+    done(null, user);
+});
+passport.deserializeUser((user, done) => {
+    done(null, user);
+});
 
 // Passport middleware
 app.use(passport.initialize());
@@ -46,13 +53,6 @@ passport.use(
         }
     )
 );
-
-passport.serializeUser((user, done) => {
-    done(null, user);
-});
-passport.deserializeUser((user, done) => {
-    done(null, user);
-});
 
 // Swagger setup
 try {
