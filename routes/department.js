@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const departmentController = require("../controllers/departmentController");
+const { ensureAuthenticated } = require("../middleware/sessionAuth");
 
 // GET all departments
 router.get(
@@ -67,7 +68,7 @@ router.post(
             schema: { $ref: "#/definitions/ConflictErrorResponse" }
         }
     */
-    departmentController.createDepartment
+    ensureAuthenticated, departmentController.createDepartment
 );
 
 // PUT update department by deptId

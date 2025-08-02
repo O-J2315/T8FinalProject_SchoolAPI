@@ -29,30 +29,10 @@ app.use(
     })
 );
 
-passport.serializeUser((user, done) => {
-    done(null, user);
-});
-passport.deserializeUser((user, done) => {
-    done(null, user);
-});
-
-// Passport middleware
 app.use(passport.initialize());
 app.use(passport.session());
-// Initialize Passport
-passport.use(
-    new GithubStrategy(
-        {
-            clientID: process.env.GITHUB_CLIENT_ID,
-            clientSecret: process.env.GITHUB_CLIENT_SECRET,
-            callbackURL: process.env.GITHUB_CALLBACK_URL,
-        },
-        (accessToken, refreshToken, profile, done) => {
-            // Here you would typically save the user to your database
-            return done(null, profile);
-        }
-    )
-);
+
+
 
 // Swagger setup
 try {
@@ -79,17 +59,6 @@ app.use((err, req, res, _next) => {
         error: "Something went wrong!",
     });
 });
-
-// GitHub OAuth callback route
-app.get(
-    "/auth/github/callback",
-    passport.authenticate("github", {
-        failureRedirect: "/apic-docs",
-    }),
-    (req, res) => {
-        res.redirect("/");
-    }
-);
 
 // 404 handler
 app.use((req, res) => {
