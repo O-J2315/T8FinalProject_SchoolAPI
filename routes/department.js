@@ -19,7 +19,7 @@ router.get(
 
 // GET single department by deptId
 router.get(
-    "/:deptId",
+    "/:id",
     /*  #swagger.tags = ["Departments"]
         #swagger.summary = "Get a department by ID"
         #swagger.description = "Retrieves a single department by its ID from the database."
@@ -68,12 +68,13 @@ router.post(
             schema: { $ref: "#/definitions/ConflictErrorResponse" }
         }
     */
-    ensureAuthenticated, departmentController.createDepartment
+    ensureAuthenticated,
+    departmentController.createDepartment
 );
 
 // PUT update department by deptId
 router.put(
-    "/:deptId",
+    "/:id",
     /*  #swagger.tags = ["Departments"]
         #swagger.summary = "Update an existing department"
         #swagger.description = "Update an existing department by its ID."
@@ -98,12 +99,13 @@ router.put(
             schema: { $ref: "#/definitions/NotFoundErrorResponse" }
         }
     */
+    ensureAuthenticated,
     departmentController.updateDepartment
 );
 
 // DELETE department by deptId
 router.delete(
-    "/:deptId",
+    "/:id",
     /*  #swagger.tags = ["Departments"]
         #swagger.summary = "Delete an existing department"
         #swagger.description = "Delete a department by its ID from the database."
@@ -122,6 +124,7 @@ router.delete(
             schema: { $ref: "#/definitions/NotFoundErrorResponse" }
         }
     */
+    ensureAuthenticated,
     departmentController.deleteDepartment
 );
 

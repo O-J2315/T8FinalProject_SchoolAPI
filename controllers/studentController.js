@@ -18,8 +18,8 @@ exports.getStudents = async (req, res) => {
 // GET single student by studentId
 exports.getStudentById = async (req, res) => {
     try {
-        const { studentId } = req.params;
-        const student = await Student.findOne({ studentId });
+        const { id } = req.params;
+        const student = await Student.findById(id);
         if (!student)
             return res.status(404).json({ message: "Student not found" });
         res.json(student);
@@ -65,14 +65,13 @@ exports.createStudent = async (req, res) => {
 // PUT update existing student by studentId
 exports.updateStudent = async (req, res) => {
     try {
-        const { studentId } = req.params;
+        const { id } = req.params;
         const updateData = req.body;
 
-        const updatedStudent = await Student.findOneAndUpdate(
-            { studentId },
-            updateData,
-            { new: true, runValidators: true }
-        );
+        const updatedStudent = await Student.findByIdAndUpdate(id, updateData, {
+            new: true,
+            runValidators: true,
+        });
 
         if (!updatedStudent)
             return res.status(404).json({ message: "Student not found" });
@@ -85,8 +84,8 @@ exports.updateStudent = async (req, res) => {
 // DELETE a student by studentId
 exports.deleteStudent = async (req, res) => {
     try {
-        const { studentId } = req.params;
-        const deletedStudent = await Student.findOneAndDelete({ studentId });
+        const { id } = req.params;
+        const deletedStudent = await Student.findByIdAndDelete(id);
         if (!deletedStudent)
             return res.status(404).json({ message: "Student not found" });
         res.json({ message: "Student deleted successfully" });

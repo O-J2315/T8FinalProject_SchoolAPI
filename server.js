@@ -1,9 +1,10 @@
 require("dotenv").config();
 const express = require("express");
+const cors = require("cors");
 const session = require("express-session");
 const swaggerUi = require("swagger-ui-express");
 const connectDB = require("./data/connect");
-const corsMiddleware = require("./middleware/cors");
+const corsOptions = require("./middleware/cors");
 const passport = require("./config/passport");
 const GithubStrategy = require("passport-github2").Strategy;
 
@@ -13,7 +14,7 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use(corsMiddleware);
+app.use(cors(corsOptions));
 
 // Session config
 app.use(
@@ -22,8 +23,9 @@ app.use(
         resave: false,
         saveUninitialized: false,
         cookie: {
-            secure: process.env.NODE_ENV === "production",
+            secure: process.env.NODE_ENV === "production", // HTTPS only in prod
             httpOnly: true,
+            sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
             maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
         },
     })
@@ -31,8 +33,6 @@ app.use(
 
 app.use(passport.initialize());
 app.use(passport.session());
-
-
 
 // Swagger setup
 try {

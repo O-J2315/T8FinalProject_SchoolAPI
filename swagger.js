@@ -7,8 +7,10 @@ const doc = {
         description: "API documentation for managing School resources",
         version: "1.0.0",
     },
-    host: "t8finalproject-schoolapi.onrender.com",
-    schemes: ["https"],
+    servers: [
+        { url: "http://localhost:3000" },
+        { url: "https://t8finalproject-schoolapi.onrender.com" },
+    ],
     consumes: ["application/json"],
     produces: ["application/json"],
     tags: [

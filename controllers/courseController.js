@@ -19,10 +19,14 @@ exports.getCourses = async (req, res) => {
 // GET a course by courseId
 exports.getCourseById = async (req, res) => {
     try {
-        const { courseId } = req.params;
-        const course = await Course.findOne({ courseId });
-        if (!course)
+        const { id } = req.params;
+
+        const course = await Course.findById(id);
+
+        if (!course) {
             return res.status(404).json({ message: "Course not found" });
+        }
+
         res.json(course);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -44,14 +48,13 @@ exports.createCourse = async (req, res) => {
 // PUT update existing course by courseId
 exports.updateCourse = async (req, res) => {
     try {
-        const { courseId } = req.params;
+        const { id } = req.params;
         const updateData = req.body;
 
-        const updatedCourse = await Course.findOneAndUpdate(
-            { courseId },
-            updateData,
-            { new: true, runValidators: true }
-        );
+        const updatedCourse = await Course.findByIdAndUpdate(id, updateData, {
+            new: true,
+            runValidators: true,
+        });
 
         if (!updatedCourse)
             return res.status(404).json({ message: "Course not found" });
@@ -64,8 +67,8 @@ exports.updateCourse = async (req, res) => {
 // DELETE a course by courseId
 exports.deleteCourse = async (req, res) => {
     try {
-        const { courseId } = req.params;
-        const deletedCourse = await Course.findOneAndDelete({ courseId });
+        const { id } = req.params;
+        const deletedCourse = await Course.findByIdAndDelete(id);
         if (!deletedCourse)
             return res.status(404).json({ message: "Course not found" });
         res.json({ message: "Course deleted successfully" });

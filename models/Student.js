@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 
+// Define the Student schema
 const studentSchema = new mongoose.Schema({
     studentId: { type: String, required: true, unique: true },
     firstName: { type: String, required: true, trim: true },

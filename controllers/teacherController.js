@@ -17,10 +17,13 @@ exports.getTeachers = async (req, res) => {
 // GET single teacher by teacherId
 exports.getTeacherById = async (req, res) => {
     try {
-        const { teacherId } = req.params;
-        const teacher = await Teacher.findOne({ teacherId });
-        if (!teacher)
+        const { id } = req.params; // ← use :id
+        const teacher = await Teacher.findById(id);
+
+        if (!teacher) {
             return res.status(404).json({ message: "Teacher not found" });
+        }
+
         res.json(teacher);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -52,17 +55,18 @@ exports.createTeacher = async (req, res) => {
 // PUT update teacher by teacherId
 exports.updateTeacher = async (req, res) => {
     try {
-        const { teacherId } = req.params;
+        const { id } = req.params;
         const updateData = req.body;
 
-        const updatedTeacher = await Teacher.findOneAndUpdate(
-            { teacherId },
-            updateData,
-            { new: true, runValidators: true }
-        );
+        const updatedTeacher = await Teacher.findByIdAndUpdate(id, updateData, {
+            new: true,
+            runValidators: true,
+        });
 
-        if (!updatedTeacher)
+        if (!updatedTeacher) {
             return res.status(404).json({ message: "Teacher not found" });
+        }
+
         res.json(updatedTeacher);
     } catch (error) {
         res.status(400).json({ message: error.message });
@@ -72,10 +76,14 @@ exports.updateTeacher = async (req, res) => {
 // DELETE teacher by teacherId
 exports.deleteTeacher = async (req, res) => {
     try {
-        const { teacherId } = req.params;
-        const deletedTeacher = await Teacher.findOneAndDelete({ teacherId });
-        if (!deletedTeacher)
+        const { id } = req.params;
+
+        const deletedTeacher = await Teacher.findByIdAndDelete(id);
+
+        if (!deletedTeacher) {
             return res.status(404).json({ message: "Teacher not found" });
+        }
+
         res.json({ message: "Teacher deleted successfully" });
     } catch (error) {
         res.status(500).json({ message: error.message });

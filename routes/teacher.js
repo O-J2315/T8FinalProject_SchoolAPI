@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const teacherController = require("../controllers/teacherController");
+const { ensureAuthenticated } = require("../middleware/sessionAuth");
 
 // GET all teachers (with optional filter by deptId)
 router.get(
@@ -24,7 +25,7 @@ router.get(
 
 // GET single teacher by teacherId
 router.get(
-    "/:teacherId",
+    "/:id",
     /*  #swagger.tags = ["Teachers"]
         #swagger.summary = "Get a teacher by ID"
         #swagger.description = "Retrieve a single teacher by their ID from the database."
@@ -77,12 +78,13 @@ router.post(
             schema: { $ref: "#/definitions/ConflictErrorResponse" }
         }
     */
+    ensureAuthenticated,
     teacherController.createTeacher
 );
 
 // PUT update teacher by teacherId
 router.put(
-    "/:teacherId",
+    "/:id",
     /*  #swagger.tags = ["Teachers"]
         #swagger.summary = "Update an existing teacher"
         #swagger.description = "Update an existing teacher by their ID."
@@ -107,12 +109,13 @@ router.put(
             schema: { $ref: "#/definitions/NotFoundErrorResponse" }
         }
     */
+    ensureAuthenticated,
     teacherController.updateTeacher
 );
 
 // DELETE teacher by teacherId
 router.delete(
-    "/:teacherId",
+    "/:id",
     /*  #swagger.tags = ["Teachers"]
         #swagger.summary = "Delete an existing teacher"
         #swagger.description = "Delete a teacher by their ID from the database,"
@@ -131,6 +134,7 @@ router.delete(
             schema: { $ref: "#/definitions/NotFoundErrorResponse" }
         }
     */
+    ensureAuthenticated,
     teacherController.deleteTeacher
 );
 

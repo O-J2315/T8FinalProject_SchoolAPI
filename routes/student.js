@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const studentController = require("../controllers/studentController");
+const { ensureAuthenticated } = require("../middleware/sessionAuth");
 
 // GET all students (with optional filter)
 router.get(
@@ -10,9 +11,9 @@ router.get(
     studentController.getStudents
 );
 
-// GET single student by studentId
+// GET single student by id
 router.get(
-    "/:studentId",
+    "/:id",
     /*  #swagger.tags = ["Students"]
      */
     studentController.getStudentById
@@ -23,22 +24,25 @@ router.post(
     "/",
     /*  #swagger.tags = ["Students"]
      */
+    ensureAuthenticated,
     studentController.createStudent
 );
 
-// PUT update student by studentId
+// PUT update student by id
 router.put(
-    "/:studentId",
+    "/:id",
     /*  #swagger.tags = ["Students"]
      */
+    ensureAuthenticated,
     studentController.updateStudent
 );
 
-// DELETE student by studentId
+// DELETE student by id
 router.delete(
-    "/:studentId",
+    "/:id",
     /*  #swagger.tags = ["Students"]
      */
+    ensureAuthenticated,
     studentController.deleteStudent
 );
 

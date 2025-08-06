@@ -7,7 +7,7 @@
     },
     "servers": [
         {
-            "url": "http://localhost:3000/"
+            "url": "http://localhost:3000"
         },
         {
             "url": "https://t8finalproject-schoolapi.onrender.com"
@@ -36,9 +36,18 @@
         }
     ],
     "paths": {
+        "/auth/github/callback": {
+            "get": {
+                "description": "",
+                "responses": {
+                    "default": {
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/": {
             "get": {
-                "tags": ["Home"],
                 "description": "",
                 "responses": {
                     "200": {
@@ -78,24 +87,60 @@
             },
             "post": {
                 "tags": ["Courses"],
-                "description": "",
+                "description": "Create a new course",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "courseId": {
+                                        "example": "MATH101"
+                                    },
+                                    "courseName": {
+                                        "example": "Calculus 101"
+                                    },
+                                    "deptId": {
+                                        "example": "64f1b2bcd9a3e1f1a2345678"
+                                    },
+                                    "teacherId": {
+                                        "example": "64f1c3d4e5f6789123456789"
+                                    },
+                                    "credits": {
+                                        "example": 4
+                                    }
+                                },
+                                "required": [
+                                    "courseId",
+                                    "courseName",
+                                    "deptId",
+                                    "teacherId",
+                                    "credits"
+                                ]
+                            }
+                        }
+                    }
+                },
                 "responses": {
                     "201": {
                         "description": "Created"
                     },
                     "400": {
                         "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
                     }
                 }
             }
         },
-        "/courses/{courseId}": {
+        "/courses/{id}": {
             "get": {
                 "tags": ["Courses"],
                 "description": "",
                 "parameters": [
                     {
-                        "name": "courseId",
+                        "name": "id",
                         "in": "path",
                         "required": true,
                         "schema": {
@@ -117,23 +162,60 @@
             },
             "put": {
                 "tags": ["Courses"],
-                "description": "",
+                "description": "Update an existing course by ID",
                 "parameters": [
                     {
-                        "name": "courseId",
+                        "name": "id",
                         "in": "path",
                         "required": true,
                         "schema": {
                             "type": "string"
-                        }
+                        },
+                        "description": "MongoDB _id of the course to update"
                     }
                 ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "courseId": {
+                                        "example": "CA101"
+                                    },
+                                    "courseName": {
+                                        "example": "Calculus 101"
+                                    },
+                                    "deptId": {
+                                        "example": "64f1b2bcd9a3e1f1a2345678"
+                                    },
+                                    "teacherId": {
+                                        "example": "64f1c3d4e5f6789123456789"
+                                    },
+                                    "credits": {
+                                        "example": 4
+                                    }
+                                },
+                                "required": [
+                                    "courseName",
+                                    "deptId",
+                                    "teacherId",
+                                    "credits"
+                                ]
+                            }
+                        }
+                    }
+                },
                 "responses": {
                     "200": {
                         "description": "OK"
                     },
                     "400": {
                         "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
                     },
                     "404": {
                         "description": "Not Found"
@@ -145,7 +227,7 @@
                 "description": "",
                 "parameters": [
                     {
-                        "name": "courseId",
+                        "name": "id",
                         "in": "path",
                         "required": true,
                         "schema": {
@@ -156,6 +238,9 @@
                 "responses": {
                     "200": {
                         "description": "OK"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
                     },
                     "404": {
                         "description": "Not Found"
@@ -227,6 +312,9 @@
                             }
                         }
                     },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
                     "409": {
                         "description": "Conflict - Department with same ID already exists",
                         "content": {
@@ -255,20 +343,19 @@
                 }
             }
         },
-        "/departments/{deptId}": {
+        "/departments/{id}": {
             "get": {
                 "tags": ["Departments"],
                 "summary": "Get a department by ID",
                 "description": "Retrieves a single department by its ID from the database.",
                 "parameters": [
                     {
-                        "name": "deptId",
+                        "name": "id",
                         "in": "path",
                         "required": true,
                         "schema": {
                             "type": "string"
-                        },
-                        "description": "Deparment ID to retrieve"
+                        }
                     }
                 ],
                 "responses": {
@@ -313,7 +400,7 @@
                 "description": "Update an existing department by its ID.",
                 "parameters": [
                     {
-                        "name": "deptId",
+                        "name": "id",
                         "in": "path",
                         "required": true,
                         "schema": {
@@ -352,6 +439,9 @@
                             }
                         }
                     },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
                     "404": {
                         "description": "Not found - Department with specified ID does not exist",
                         "content": {
@@ -385,13 +475,21 @@
                 "description": "Delete a department by its ID from the database.",
                 "parameters": [
                     {
-                        "name": "deptId",
+                        "name": "id",
                         "in": "path",
                         "required": true,
                         "schema": {
                             "type": "string"
-                        },
-                        "description": "Deparment ID to delete"
+                        }
+                    },
+                    {
+                        "name": "deptId",
+                        "in": "path",
+                        "description": "Deparment ID to delete",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 ],
                 "responses": {
@@ -409,6 +507,9 @@
                                 }
                             }
                         }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
                     },
                     "404": {
                         "description": "Not found - Department with specified ID does not exist",
@@ -469,6 +570,9 @@
                     },
                     "400": {
                         "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
                     }
                 },
                 "requestBody": {
@@ -511,13 +615,13 @@
                 }
             }
         },
-        "/students/{studentId}": {
+        "/students/{id}": {
             "get": {
                 "tags": ["Students"],
                 "description": "",
                 "parameters": [
                     {
-                        "name": "studentId",
+                        "name": "id",
                         "in": "path",
                         "required": true,
                         "schema": {
@@ -542,7 +646,7 @@
                 "description": "",
                 "parameters": [
                     {
-                        "name": "studentId",
+                        "name": "id",
                         "in": "path",
                         "required": true,
                         "schema": {
@@ -557,6 +661,9 @@
                     "400": {
                         "description": "Bad Request"
                     },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
                     "404": {
                         "description": "Not Found"
                     }
@@ -567,7 +674,7 @@
                 "description": "",
                 "parameters": [
                     {
-                        "name": "studentId",
+                        "name": "id",
                         "in": "path",
                         "required": true,
                         "schema": {
@@ -578,6 +685,9 @@
                 "responses": {
                     "200": {
                         "description": "OK"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
                     },
                     "404": {
                         "description": "Not Found"
@@ -660,6 +770,9 @@
                             }
                         }
                     },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
                     "404": {
                         "description": "Not found - Department with specified ID does not exist",
                         "content": {
@@ -703,20 +816,28 @@
                 }
             }
         },
-        "/teachers/{teacherId}": {
+        "/teachers/{id}": {
             "get": {
                 "tags": ["Teachers"],
                 "summary": "Get a teacher by ID",
                 "description": "Retrieve a single teacher by their ID from the database.",
                 "parameters": [
                     {
-                        "name": "teacherId",
+                        "name": "id",
                         "in": "path",
                         "required": true,
                         "schema": {
                             "type": "string"
-                        },
-                        "description": "Teacher ID to retrieve"
+                        }
+                    },
+                    {
+                        "name": "teacherId",
+                        "in": "path",
+                        "description": "Teacher ID to retrieve",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 ],
                 "responses": {
@@ -761,7 +882,7 @@
                 "description": "Update an existing teacher by their ID.",
                 "parameters": [
                     {
-                        "name": "teacherId",
+                        "name": "id",
                         "in": "path",
                         "required": true,
                         "schema": {
@@ -800,6 +921,9 @@
                             }
                         }
                     },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
                     "404": {
                         "description": "Not found - Department / Teacher with specified ID does not exist",
                         "content": {
@@ -833,13 +957,21 @@
                 "description": "Delete a teacher by their ID from the database,",
                 "parameters": [
                     {
-                        "name": "teacherId",
+                        "name": "id",
                         "in": "path",
                         "required": true,
                         "schema": {
                             "type": "string"
-                        },
-                        "description": "Teacher ID to delete"
+                        }
+                    },
+                    {
+                        "name": "teacherId",
+                        "in": "path",
+                        "description": "Teacher ID to delete",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 ],
                 "responses": {
@@ -857,6 +989,9 @@
                                 }
                             }
                         }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
                     },
                     "404": {
                         "description": "Not found - Teacher with specified ID does not exist",
