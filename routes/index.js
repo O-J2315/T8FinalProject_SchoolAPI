@@ -15,10 +15,14 @@ router.use("/students", studentRoutes);
 router.use("/teachers", teacherRoutes);
 
 //Login route
-router.get("/login", (req, res, next) => {
-  console.log("Login route hit");
-  next();
-}, passport.authenticate("github", { scope: ["user:email"] }));
+router.get(
+    "/login",
+    (req, res, next) => {
+        console.log("Login route hit");
+        next();
+    },
+    passport.authenticate("github", { scope: ["user:email"] })
+);
 
 // GitHub callback route
 router.get(

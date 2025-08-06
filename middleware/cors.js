@@ -1,4 +1,4 @@
-const cors = require("cors");
+// const cors = require("cors");
 
 const corsOptions = {
     origin: process.env.FRONTEND_URL, // e.g., https://legacyfence.com

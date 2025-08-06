@@ -2,11 +2,12 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const session = require("express-session");
+const MongoStore = require("connect-mongo");
 const swaggerUi = require("swagger-ui-express");
 const connectDB = require("./data/connect");
 const corsOptions = require("./middleware/cors");
 const passport = require("./config/passport");
-const GithubStrategy = require("passport-github2").Strategy;
+// const GithubStrategy = require("passport-github2").Strategy;
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -16,16 +17,21 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(cors(corsOptions));
 
+app.set("trust proxy", 1);
+
 // Session config
 app.use(
     session({
-        secret: process.env.SESSION_SECRET || "secret",
+        secret: process.env.SESSION_SECRET,
         resave: false,
         saveUninitialized: false,
+        store: MongoStore.create({
+            mongoUrl: process.env.MONGODB_URI, // Your connection string
+        }),
         cookie: {
-            secure: process.env.NODE_ENV === "production", // HTTPS only in prod
+            secure: true, // only if HTTPS
+            sameSite: "lax",
             httpOnly: true,
-            sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
             maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
         },
     })
