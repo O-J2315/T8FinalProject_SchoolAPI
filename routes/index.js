@@ -26,10 +26,8 @@ router.get(
     "/auth/github/callback",
     passport.authenticate("github", {
         failureRedirect: "/api-docs",
-    }),
-    (req, res) => {
-        res.redirect("/");
-    }
+        successRedirect: "/",
+    })
 );
 
 // Home route
