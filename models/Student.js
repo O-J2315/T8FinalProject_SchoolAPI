@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 
+// Define the Student schema
 const studentSchema = new mongoose.Schema({
     studentId: { type: String, required: true, unique: true },
     firstName: { type: String, required: true, trim: true },
@@ -11,7 +12,12 @@ const studentSchema = new mongoose.Schema({
         lowercase: true,
         trim: true,
     },
-    major: { type: String, required: true },
+    major: { type: String, required: true }, // Same as deptId in Teacher
+    dept: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Department",
+        required: true,
+    },
     status: {
         type: String,
         enum: ["active", "graduated", "withdrawn"],
@@ -19,7 +25,7 @@ const studentSchema = new mongoose.Schema({
     },
     GPA: { type: Number, min: 0, max: 4 },
     enrollmentDate: { type: Date, required: true },
-    courses: [{ type: String }],
+    courses: [{ type: mongoose.Schema.Types.ObjectId, ref: "Course" }],
 });
 
 module.exports = mongoose.model("Student", studentSchema);

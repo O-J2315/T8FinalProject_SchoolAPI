@@ -1,4 +1,6 @@
 const Teacher = require("../models/Teacher");
+const Department = require("../models/Department");
+const Course = require("../models/Course");
 
 // GET all teachers or filter by deptId
 exports.getTeachers = async (req, res) => {
@@ -7,7 +9,10 @@ exports.getTeachers = async (req, res) => {
         const filter = {};
         if (deptId) filter.deptId = deptId;
 
-        const teachers = await Teacher.find(filter);
+        const teachers = await Teacher.find(filter)
+            .populate("dept", "deptId deptName")
+            .populate("courses", "courseId courseName");
+
         res.json(teachers);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -18,9 +23,14 @@ exports.getTeachers = async (req, res) => {
 exports.getTeacherById = async (req, res) => {
     try {
         const { teacherId } = req.params;
-        const teacher = await Teacher.findOne({ teacherId });
-        if (!teacher)
+        const teacher = await Teacher.findOne({ teacherId })
+            .populate("dept", "deptId deptName")
+            .populate("courses", "courseId courseName");
+
+        if (!teacher) {
             return res.status(404).json({ message: "Teacher not found" });
+        }
+
         res.json(teacher);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -33,13 +43,42 @@ exports.createTeacher = async (req, res) => {
         const { teacherId, firstName, lastName, email, deptId, courses } =
             req.body;
 
+        //Check if teacherId already exists
+        const existing = await Teacher.findOne({ teacherId });
+        if (existing) {
+            return res
+                .status(400)
+                .json({ message: "Teacher ID already exists" });
+        }
+
+        // Resolve dept reference via deptId
+        const department = await Department.findOne({ deptId });
+        if (!department) {
+            return res.status(400).json({ message: "Invalid department ID" });
+        }
+
+        // Resolve courses references
+        let courseRefs = [];
+        if (courses && courses.length > 0) {
+            const courseDocs = await Course.find({
+                courseId: { $in: courses },
+            });
+            if (courseDocs.length !== courses.length) {
+                return res
+                    .status(400)
+                    .json({ message: "One or more invalid course IDs" });
+            }
+            courseRefs = courseDocs.map((c) => c._id);
+        }
+
         const newTeacher = new Teacher({
             teacherId,
             firstName,
             lastName,
             email,
             deptId,
-            courses,
+            dept: department._id, // reference to Department
+            courses: courseRefs, // reference to Course
         });
 
         await newTeacher.save();
@@ -55,14 +94,49 @@ exports.updateTeacher = async (req, res) => {
         const { teacherId } = req.params;
         const updateData = req.body;
 
+        // Resolve dept reference if updating deptId
+        if (updateData.deptId) {
+            const department = await Department.findOne({
+                deptId: updateData.deptId,
+            });
+            if (!department) {
+                return res
+                    .status(400)
+                    .json({ message: "Invalid department ID" });
+            }
+            updateData.dept = department._id; // updated to actual reference
+        }
+
+        // Resolve course references if updating courses
+        if (Array.isArray(updateData.courses)) {
+            if (updateData.courses.length > 0) {
+                const courseDocs = await Course.find({
+                    courseId: { $in: updateData.courses },
+                });
+                if (courseDocs.length !== updateData.courses.length) {
+                    return res
+                        .status(400)
+                        .json({ message: "One or more invalid course IDs" });
+                }
+                updateData.courses = courseDocs.map((c) => c._id); // update to actual reference
+            } else {
+                updateData.courses = []; // clear if passed as empty
+            }
+        }
+
         const updatedTeacher = await Teacher.findOneAndUpdate(
             { teacherId },
             updateData,
-            { new: true, runValidators: true }
+            {
+                new: true,
+                runValidators: true,
+            }
         );
 
-        if (!updatedTeacher)
+        if (!updatedTeacher) {
             return res.status(404).json({ message: "Teacher not found" });
+        }
+
         res.json(updatedTeacher);
     } catch (error) {
         res.status(400).json({ message: error.message });
@@ -73,9 +147,13 @@ exports.updateTeacher = async (req, res) => {
 exports.deleteTeacher = async (req, res) => {
     try {
         const { teacherId } = req.params;
+
         const deletedTeacher = await Teacher.findOneAndDelete({ teacherId });
-        if (!deletedTeacher)
+
+        if (!deletedTeacher) {
             return res.status(404).json({ message: "Teacher not found" });
+        }
+
         res.json({ message: "Teacher deleted successfully" });
     } catch (error) {
         res.status(500).json({ message: error.message });

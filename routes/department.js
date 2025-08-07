@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const departmentController = require("../controllers/departmentController");
+const { ensureAuthenticated } = require("../middleware/sessionAuth");
 const { validateDepartment } = require("../validations/departmentValidation");
 const validate = require("../middleware/validate");
 
@@ -62,14 +63,19 @@ router.post(
             schema: { $ref: "#/definitions/DepartmentResponse" }
         }
         #swagger.responses[400] = {
-            description: "Bad request - Invalid input data",
+            description: "Bad request - Invalid or missing input data",
             schema: { $ref: "#/definitions/ValidationErrorResponse" }
         }
+        #swagger.responses[401] = {
+            description: "Unauthorized - Authentication required to create a department",
+            schema: { $ref: "#/definitions/AuthenticationErrorResponse" }
+        }
         #swagger.responses[409] = {
-            description: "Conflict - Department with same ID already exists",
+            description: "Conflict - Department with specified ID already exists",
             schema: { $ref: "#/definitions/ConflictErrorResponse" }
         }
     */
+    ensureAuthenticated,
     departmentController.createDepartment
 );
 
@@ -93,14 +99,19 @@ router.put(
             schema: { $ref: "#/definitions/DepartmentResponse" }
         }
         #swagger.responses[400] = {
-            description: "Bad request - Invalid input data",
+            description: "Bad request - Invalid or missing input data",
             schema: { $ref: "#/definitions/ValidationErrorResponse" }
+        }
+        #swagger.responses[401] = {
+            description: "Unauthorized - Authentication required to update a department",
+            schema: { $ref: "#/definitions/AuthenticationErrorResponse" }
         }
         #swagger.responses[404] = {
             description: "Not found - Department with specified ID does not exist",
             schema: { $ref: "#/definitions/NotFoundErrorResponse" }
         }
     */
+    ensureAuthenticated,
     departmentController.updateDepartment
 );
 
@@ -120,11 +131,16 @@ router.delete(
             description: "Department deleted successfully",
             schema: { $ref: "#/definitions/DepartmentResponse" }
         }
+        #swagger.responses[401] = {
+            description: "Unauthorized - Authentication required to delete a department",
+            schema: { $ref: "#/definitions/AuthenticationErrorResponse" }
+        }
         #swagger.responses[404] = {
             description: "Not found - Department with specified ID does not exist",
             schema: { $ref: "#/definitions/NotFoundErrorResponse" }
         }
     */
+    ensureAuthenticated,
     departmentController.deleteDepartment
 );
 

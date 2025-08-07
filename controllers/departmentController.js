@@ -15,8 +15,9 @@ exports.getDepartmentById = async (req, res) => {
     try {
         const { deptId } = req.params;
         const department = await Department.findOne({ deptId });
-        if (!department)
+        if (!department) {
             return res.status(404).json({ message: "Department not found" });
+        }
         res.json(department);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -27,6 +28,14 @@ exports.getDepartmentById = async (req, res) => {
 exports.createDepartment = async (req, res) => {
     try {
         const { deptId, deptName, location, deptEmail } = req.body;
+
+        // Check if deptId already exists
+        const existing = await Department.findOne({ deptId });
+        if (existing) {
+            return res
+                .status(400)
+                .json({ message: "Department ID already exists" });
+        }
 
         const newDepartment = new Department({
             deptId,
@@ -54,8 +63,9 @@ exports.updateDepartment = async (req, res) => {
             { new: true, runValidators: true }
         );
 
-        if (!updatedDepartment)
+        if (!updatedDepartment) {
             return res.status(404).json({ message: "Department not found" });
+        }
         res.json(updatedDepartment);
     } catch (error) {
         res.status(400).json({ message: error.message });
@@ -67,8 +77,9 @@ exports.deleteDepartment = async (req, res) => {
     try {
         const { deptId } = req.params;
         const deletedDepartment = await Department.findOneAndDelete({ deptId });
-        if (!deletedDepartment)
+        if (!deletedDepartment) {
             return res.status(404).json({ message: "Department not found" });
+        }
         res.json({ message: "Department deleted successfully" });
     } catch (error) {
         res.status(500).json({ message: error.message });

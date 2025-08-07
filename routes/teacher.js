@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const teacherController = require("../controllers/teacherController");
+const { ensureAuthenticated } = require("../middleware/sessionAuth");
 const { validateTeacher } = require("../validations/teacherValidation");
 const validate = require("../middleware/validate");
 
@@ -68,18 +69,23 @@ router.post(
             schema: { $ref: "#/definitions/TeacherResponse" }
         }
         #swagger.responses[400] = {
-            description: "Bad request - Invalid input data",
+            description: "Bad request - Invalid or missing input data",
             schema: { $ref: "#/definitions/ValidationErrorResponse" }
+        }
+        #swagger.responses[401] = {
+            description: "Unauthorized - Authentication required to create a teacher",
+            schema: { $ref: "#/definitions/AuthenticationErrorResponse" }
         }
         #swagger.responses[404] = {
             description: "Not found - Department with specified ID does not exist",
             schema: { $ref: "#/definitions/NotFoundErrorResponse" }
         }
         #swagger.responses[409] = {
-            description: "Conflict - Teacher with same ID already exists",
+            description: "Conflict - Teacher with specified ID or email already exists",
             schema: { $ref: "#/definitions/ConflictErrorResponse" }
         }
     */
+    ensureAuthenticated,
     teacherController.createTeacher
 );
 
@@ -103,14 +109,19 @@ router.put(
             schema: { $ref: "#/definitions/TeacherResponse" }
         }
         #swagger.responses[400] = {
-            description: "Bad request - Invalid input data",
+            description: "Bad request - Invalid or missing input data",
             schema: { $ref: "#/definitions/ValidationErrorResponse" }
+        }
+        #swagger.responses[401] = {
+            description: "Unauthorized - Authentication required to update a teacher",
+            schema: { $ref: "#/definitions/AuthenticationErrorResponse" }
         }
         #swagger.responses[404] = {
             description: "Not found - Department / Teacher with specified ID does not exist",
             schema: { $ref: "#/definitions/NotFoundErrorResponse" }
         }
     */
+    ensureAuthenticated,
     teacherController.updateTeacher
 );
 
@@ -130,11 +141,16 @@ router.delete(
             description: "Teacher deleted successfully",
             schema: { $ref: "#/definitions/TeacherResponse" }
         }
+        #swagger.responses[401] = {
+            description: "Unauthorized - Authentication required to delete a teacher",
+            schema: { $ref: "#/definitions/AuthenticationErrorResponse" }
+        }
         #swagger.responses[404] = {
             description: "Not found - Teacher with specified ID does not exist",
             schema: { $ref: "#/definitions/NotFoundErrorResponse" }
         }
     */
+    ensureAuthenticated,
     teacherController.deleteTeacher
 );
 

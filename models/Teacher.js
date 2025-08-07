@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 
+// Define the teacher schema
 const teacherSchema = new mongoose.Schema({
     teacherId: { type: String, required: true, unique: true },
     firstName: { type: String, required: true, trim: true },
@@ -12,7 +13,12 @@ const teacherSchema = new mongoose.Schema({
         trim: true,
     },
     deptId: { type: String, required: true },
-    courses: [{ type: String }],
+    dept: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Department",
+        required: true,
+    },
+    courses: [{ type: mongoose.Schema.Types.ObjectId, ref: "Course" }],
 });
 
 module.exports = mongoose.model("Teacher", teacherSchema);

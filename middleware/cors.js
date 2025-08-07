@@ -1,10 +1,7 @@
-const cors = require("cors");
+// const cors = require("cors");
 
 const corsOptions = {
-    origin:
-        process.env.NODE_ENV === "production"
-            ? process.env.FRONTEND_URL
-            : ["http://localhost:3000", "http://localhost:3001"],
+    origin: process.env.FRONTEND_URL, // e.g., https://legacyfence.com
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: [
@@ -14,6 +11,7 @@ const corsOptions = {
         "Accept",
         "Authorization",
     ],
+    optionsSuccessStatus: 200, // for legacy browsers
 };
 
-module.exports = cors(corsOptions);
+module.exports = corsOptions;

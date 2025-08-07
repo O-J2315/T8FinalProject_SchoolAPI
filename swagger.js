@@ -7,21 +7,22 @@ const doc = {
         description: "API documentation for managing School resources",
         version: "1.0.0",
     },
-    host: "t8finalproject-schoolapi.onrender.com",
-    schemes: ["https"],
+    servers: [
+        { url: "http://localhost:3000" },
+        { url: "https://t8finalproject-schoolapi.onrender.com" },
+    ],
     consumes: ["application/json"],
     produces: ["application/json"],
     tags: [
-        { name: "Home", description: "Home page" },
         {
             name: "Departments",
             description: "Department management operations",
         },
         { name: "Teachers", description: "Teacher management operations" },
-        { name: "Courses", description: "Course management operations (WIP)" },
+        { name: "Courses", description: "Course management operations" },
         {
             name: "Students",
-            description: "Student management operations (WIP)",
+            description: "Student management operations",
         },
     ],
     definitions: definitions,
