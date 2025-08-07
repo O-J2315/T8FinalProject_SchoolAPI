@@ -1,7 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const courseController = require("../controllers/courseController");
-//const authenticateJWT = require('../middlewares/jwtAuth');
+const { validateCourse } = require("../validations/courseValidation");
+const validate = require("../middleware/validate");
 
 // GET routes
 router.get(
@@ -18,17 +19,19 @@ router.get(
     courseController.getCourseById
 );
 
-// Post route
+// Post route with validation
 router.post(
     "/",
+    validate(validateCourse),
     /*  #swagger.tags = ["Courses"]
      */
     courseController.createCourse
 );
 
-// Put route
+// Put route with validation
 router.put(
     "/:courseId",
+    validate(validateCourse),
     /*  #swagger.tags = ["Courses"]
      */
     courseController.updateCourse

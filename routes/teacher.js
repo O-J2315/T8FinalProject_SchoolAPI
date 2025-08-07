@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const teacherController = require("../controllers/teacherController");
+const { validateTeacher } = require("../validations/teacherValidation");
+const validate = require("../middleware/validate");
 
 // GET all teachers (with optional filter by deptId)
 router.get(
@@ -46,9 +48,10 @@ router.get(
     teacherController.getTeacherById
 );
 
-// POST create new teacher
+// POST create new teacher with validation
 router.post(
     "/",
+    validate(validateTeacher),
     /*  #swagger.tags = ["Teachers"]
         #swagger.summary = "Create a new teacher"
         #swagger.description = "Create a new teacher in the database."
@@ -80,9 +83,10 @@ router.post(
     teacherController.createTeacher
 );
 
-// PUT update teacher by teacherId
+// PUT update teacher by teacherId with validation
 router.put(
     "/:teacherId",
+    validate(validateTeacher),
     /*  #swagger.tags = ["Teachers"]
         #swagger.summary = "Update an existing teacher"
         #swagger.description = "Update an existing teacher by their ID."

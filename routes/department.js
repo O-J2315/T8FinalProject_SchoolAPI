@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const departmentController = require("../controllers/departmentController");
+const { validateDepartment } = require("../validations/departmentValidation");
+const validate = require("../middleware/validate");
 
 // GET all departments
 router.get(
@@ -24,7 +26,7 @@ router.get(
         #swagger.description = "Retrieves a single department by its ID from the database."
         #swagger.parameters["deptId"] = {
             in: "path",
-            description: "Deparment ID to retrieve",
+            description: "Department ID to retrieve",
             required: true,
             type: "string"
         }
@@ -40,9 +42,10 @@ router.get(
     departmentController.getDepartmentById
 );
 
-// POST create new department
+// POST create new department with validation
 router.post(
     "/",
+    validate(validateDepartment),
     /*  #swagger.tags = ["Departments"]
         #swagger.summary = "Create a new department"
         #swagger.description = "Create a new department in the database."
@@ -70,9 +73,10 @@ router.post(
     departmentController.createDepartment
 );
 
-// PUT update department by deptId
+// PUT update department by deptId with validation
 router.put(
     "/:deptId",
+    validate(validateDepartment),
     /*  #swagger.tags = ["Departments"]
         #swagger.summary = "Update an existing department"
         #swagger.description = "Update an existing department by its ID."
@@ -108,7 +112,7 @@ router.delete(
         #swagger.description = "Delete a department by its ID from the database."
         #swagger.parameters['deptId'] = {
             in: "path",
-            description: "Deparment ID to delete",
+            description: "Department ID to delete",
             required: true,
             type: "string"
         }
