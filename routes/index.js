@@ -17,6 +17,7 @@ router.use("/teachers", teacherRoutes);
 //Login route
 router.get(
     "/login",
+    // #swagger.ignore = true
     (req, res, next) => {
         console.log("Login route hit");
         next();
@@ -27,6 +28,7 @@ router.get(
 // GitHub callback route
 router.get(
     "/auth/github/callback",
+    // #swagger.ignore = true
     passport.authenticate("github", {
         failureRedirect: "/api-docs",
         successRedirect: "/",
@@ -34,34 +36,38 @@ router.get(
 );
 
 // Home route
-router.get("/", (req, res) => {
-    if (req.isAuthenticated()) {
-        res.json({
-            message: `Welcome to School Management API, ${req.user.username}`,
-            user: {
-                username: req.user.username,
-                // displayName: req.user.displayName,
-                profileUrl: req.user.profileUrl,
-                avatar: req.user.avatar,
-            },
-            endpoints: {
-                courses: "/courses",
-                departments: "/departments",
-                students: "/students",
-                teachers: "/teachers",
-                logout: "/logout",
+router.get(
+    "/",
+    // #swagger.ignore = true
+    (req, res) => {
+        if (req.isAuthenticated()) {
+            res.json({
+                message: `Welcome to School Management API, ${req.user.username}`,
+                user: {
+                    username: req.user.username,
+                    // displayName: req.user.displayName,
+                    profileUrl: req.user.profileUrl,
+                    avatar: req.user.avatar,
+                },
+                endpoints: {
+                    courses: "/courses",
+                    departments: "/departments",
+                    students: "/students",
+                    teachers: "/teachers",
+                    logout: "/logout",
+                    docs: "/api-docs",
+                },
+            });
+        } else {
+            res.json({
+                message: "Welcome to School Management API",
+                status: "Not logged in",
+                login: "Visit /login to authenticate with GitHub",
                 docs: "/api-docs",
-            },
-        });
-    } else {
-        res.json({
-            message: "Welcome to School Management API",
-            status: "Not logged in",
-            login: "Visit /login to authenticate with GitHub",
-            docs: "/api-docs",
-        });
+            });
+        }
     }
-});
+);
 
 // Logout route
 router.get(

@@ -13,10 +13,11 @@ exports.getDepartments = async (req, res) => {
 // GET single department by deptId
 exports.getDepartmentById = async (req, res) => {
     try {
-        const { id } = req.params;
-        const department = await Department.findById(id);
-        if (!department)
+        const { deptId } = req.params;
+        const department = await Department.findOne({ deptId });
+        if (!department) {
             return res.status(404).json({ message: "Department not found" });
+        }
         res.json(department);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -27,6 +28,14 @@ exports.getDepartmentById = async (req, res) => {
 exports.createDepartment = async (req, res) => {
     try {
         const { deptId, deptName, location, deptEmail } = req.body;
+
+        // Check if deptId already exists
+        const existing = await Department.findOne({ deptId });
+        if (existing) {
+            return res
+                .status(400)
+                .json({ message: "Department ID already exists" });
+        }
 
         const newDepartment = new Department({
             deptId,
@@ -45,17 +54,18 @@ exports.createDepartment = async (req, res) => {
 // PUT update department by deptId
 exports.updateDepartment = async (req, res) => {
     try {
-        const { id } = req.params;
+        const { deptId } = req.params;
         const updateData = req.body;
 
-        const updatedDepartment = await Department.findByIdAndUpdate(
-            id,
+        const updatedDepartment = await Department.findOneAndUpdate(
+            { deptId },
             updateData,
             { new: true, runValidators: true }
         );
 
-        if (!updatedDepartment)
+        if (!updatedDepartment) {
             return res.status(404).json({ message: "Department not found" });
+        }
         res.json(updatedDepartment);
     } catch (error) {
         res.status(400).json({ message: error.message });
@@ -65,10 +75,11 @@ exports.updateDepartment = async (req, res) => {
 // DELETE department by deptId
 exports.deleteDepartment = async (req, res) => {
     try {
-        const { id } = req.params;
-        const deletedDepartment = await Department.findByIdAndDelete(id);
-        if (!deletedDepartment)
+        const { deptId } = req.params;
+        const deletedDepartment = await Department.findOneAndDelete({ deptId });
+        if (!deletedDepartment) {
             return res.status(404).json({ message: "Department not found" });
+        }
         res.json({ message: "Department deleted successfully" });
     } catch (error) {
         res.status(500).json({ message: error.message });

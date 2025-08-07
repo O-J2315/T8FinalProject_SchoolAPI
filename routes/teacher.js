@@ -25,7 +25,7 @@ router.get(
 
 // GET single teacher by teacherId
 router.get(
-    "/:id",
+    "/:teacherId",
     /*  #swagger.tags = ["Teachers"]
         #swagger.summary = "Get a teacher by ID"
         #swagger.description = "Retrieve a single teacher by their ID from the database."
@@ -66,15 +66,19 @@ router.post(
             schema: { $ref: "#/definitions/TeacherResponse" }
         }
         #swagger.responses[400] = {
-            description: "Bad request - Invalid input data",
+            description: "Bad request - Invalid or missing input data",
             schema: { $ref: "#/definitions/ValidationErrorResponse" }
+        }
+        #swagger.responses[401] = {
+            description: "Unauthorized - Authentication required to create a teacher",
+            schema: { $ref: "#/definitions/AuthenticationErrorResponse" }
         }
         #swagger.responses[404] = {
             description: "Not found - Department with specified ID does not exist",
             schema: { $ref: "#/definitions/NotFoundErrorResponse" }
         }
         #swagger.responses[409] = {
-            description: "Conflict - Teacher with same ID already exists",
+            description: "Conflict - Teacher with specified ID or email already exists",
             schema: { $ref: "#/definitions/ConflictErrorResponse" }
         }
     */
@@ -84,7 +88,7 @@ router.post(
 
 // PUT update teacher by teacherId
 router.put(
-    "/:id",
+    "/:teacherId",
     /*  #swagger.tags = ["Teachers"]
         #swagger.summary = "Update an existing teacher"
         #swagger.description = "Update an existing teacher by their ID."
@@ -101,8 +105,12 @@ router.put(
             schema: { $ref: "#/definitions/TeacherResponse" }
         }
         #swagger.responses[400] = {
-            description: "Bad request - Invalid input data",
+            description: "Bad request - Invalid or missing input data",
             schema: { $ref: "#/definitions/ValidationErrorResponse" }
+        }
+        #swagger.responses[401] = {
+            description: "Unauthorized - Authentication required to update a teacher",
+            schema: { $ref: "#/definitions/AuthenticationErrorResponse" }
         }
         #swagger.responses[404] = {
             description: "Not found - Department / Teacher with specified ID does not exist",
@@ -115,7 +123,7 @@ router.put(
 
 // DELETE teacher by teacherId
 router.delete(
-    "/:id",
+    "/:teacherId",
     /*  #swagger.tags = ["Teachers"]
         #swagger.summary = "Delete an existing teacher"
         #swagger.description = "Delete a teacher by their ID from the database,"
@@ -128,6 +136,10 @@ router.delete(
         #swagger.responses[200] = {
             description: "Teacher deleted successfully",
             schema: { $ref: "#/definitions/TeacherResponse" }
+        }
+        #swagger.responses[401] = {
+            description: "Unauthorized - Authentication required to delete a teacher",
+            schema: { $ref: "#/definitions/AuthenticationErrorResponse" }
         }
         #swagger.responses[404] = {
             description: "Not found - Teacher with specified ID does not exist",

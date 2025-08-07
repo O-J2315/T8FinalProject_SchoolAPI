@@ -19,7 +19,7 @@ router.get(
 
 // GET single department by deptId
 router.get(
-    "/:id",
+    "/:deptId",
     /*  #swagger.tags = ["Departments"]
         #swagger.summary = "Get a department by ID"
         #swagger.description = "Retrieves a single department by its ID from the database."
@@ -60,11 +60,15 @@ router.post(
             schema: { $ref: "#/definitions/DepartmentResponse" }
         }
         #swagger.responses[400] = {
-            description: "Bad request - Invalid input data",
+            description: "Bad request - Invalid or missing input data",
             schema: { $ref: "#/definitions/ValidationErrorResponse" }
         }
+        #swagger.responses[401] = {
+            description: "Unauthorized - Authentication required to create a department",
+            schema: { $ref: "#/definitions/AuthenticationErrorResponse" }
+        }
         #swagger.responses[409] = {
-            description: "Conflict - Department with same ID already exists",
+            description: "Conflict - Department with specified ID already exists",
             schema: { $ref: "#/definitions/ConflictErrorResponse" }
         }
     */
@@ -74,7 +78,7 @@ router.post(
 
 // PUT update department by deptId
 router.put(
-    "/:id",
+    "/:deptId",
     /*  #swagger.tags = ["Departments"]
         #swagger.summary = "Update an existing department"
         #swagger.description = "Update an existing department by its ID."
@@ -91,8 +95,12 @@ router.put(
             schema: { $ref: "#/definitions/DepartmentResponse" }
         }
         #swagger.responses[400] = {
-            description: "Bad request - Invalid input data",
+            description: "Bad request - Invalid or missing input data",
             schema: { $ref: "#/definitions/ValidationErrorResponse" }
+        }
+        #swagger.responses[401] = {
+            description: "Unauthorized - Authentication required to update a department",
+            schema: { $ref: "#/definitions/AuthenticationErrorResponse" }
         }
         #swagger.responses[404] = {
             description: "Not found - Department with specified ID does not exist",
@@ -105,7 +113,7 @@ router.put(
 
 // DELETE department by deptId
 router.delete(
-    "/:id",
+    "/:deptId",
     /*  #swagger.tags = ["Departments"]
         #swagger.summary = "Delete an existing department"
         #swagger.description = "Delete a department by its ID from the database."
@@ -118,6 +126,10 @@ router.delete(
         #swagger.responses[200] = {
             description: "Department deleted successfully",
             schema: { $ref: "#/definitions/DepartmentResponse" }
+        }
+        #swagger.responses[401] = {
+            description: "Unauthorized - Authentication required to delete a department",
+            schema: { $ref: "#/definitions/AuthenticationErrorResponse" }
         }
         #swagger.responses[404] = {
             description: "Not found - Department with specified ID does not exist",

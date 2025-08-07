@@ -15,10 +15,6 @@
     ],
     "tags": [
         {
-            "name": "Home",
-            "description": "Home page"
-        },
-        {
             "name": "Departments",
             "description": "Department management operations"
         },
@@ -28,49 +24,34 @@
         },
         {
             "name": "Courses",
-            "description": "Course management operations (WIP)"
+            "description": "Course management operations"
         },
         {
             "name": "Students",
-            "description": "Student management operations (WIP)"
+            "description": "Student management operations"
         }
     ],
     "paths": {
-        "/auth/github/callback": {
-            "get": {
-                "description": "",
-                "responses": {
-                    "default": {
-                        "description": ""
-                    }
-                }
-            }
-        },
-        "/": {
-            "get": {
-                "description": "",
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                }
-            }
-        },
         "/courses/": {
             "get": {
                 "tags": ["Courses"],
-                "description": "",
+                "summary": "Get all courses",
+                "description": "Retrieve all courses, optionally filtering by department or teacher.",
                 "parameters": [
                     {
-                        "name": "teacherId",
+                        "name": "deptId",
                         "in": "query",
+                        "description": "Filter by department ID",
+                        "required": false,
                         "schema": {
                             "type": "string"
                         }
                     },
                     {
-                        "name": "deptId",
+                        "name": "teacherId",
                         "in": "query",
+                        "description": "Filter by teacher ID",
+                        "required": false,
                         "schema": {
                             "type": "string"
                         }
@@ -78,7 +59,22 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "Courses retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CoursesResponse"
+                                }
+                            },
+                            "application/xml": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CoursesResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found"
                     },
                     "500": {
                         "description": "Internal Server Error"
@@ -87,73 +83,131 @@
             },
             "post": {
                 "tags": ["Courses"],
-                "description": "Create a new course",
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "type": "object",
-                                "properties": {
-                                    "courseId": {
-                                        "example": "MATH101"
-                                    },
-                                    "courseName": {
-                                        "example": "Calculus 101"
-                                    },
-                                    "deptId": {
-                                        "example": "64f1b2bcd9a3e1f1a2345678"
-                                    },
-                                    "teacherId": {
-                                        "example": "64f1c3d4e5f6789123456789"
-                                    },
-                                    "credits": {
-                                        "example": 4
-                                    }
-                                },
-                                "required": [
-                                    "courseId",
-                                    "courseName",
-                                    "deptId",
-                                    "teacherId",
-                                    "credits"
-                                ]
+                "summary": "Create a new course",
+                "description": "Create a new course in the database.",
+                "responses": {
+                    "201": {
+                        "description": "Course created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CourseResponse"
+                                }
+                            },
+                            "application/xml": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CourseResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Invalid or missing input data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationErrorResponse"
+                                }
+                            },
+                            "application/xml": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Authentication required to create a course",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthenticationErrorResponse"
+                                }
+                            },
+                            "application/xml": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthenticationErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "409": {
+                        "description": "Conflict - Course with specified ID already exists",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConflictErrorResponse"
+                                }
+                            },
+                            "application/xml": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConflictErrorResponse"
+                                }
                             }
                         }
                     }
                 },
-                "responses": {
-                    "201": {
-                        "description": "Created"
-                    },
-                    "400": {
-                        "description": "Bad Request"
-                    },
-                    "401": {
-                        "description": "Unauthorized"
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CourseInput"
+                            }
+                        }
                     }
                 }
             }
         },
-        "/courses/{id}": {
+        "/courses/{courseId}": {
             "get": {
                 "tags": ["Courses"],
-                "description": "",
+                "summary": "Get a course by ID",
+                "description": "Retrieve a single course by its ID from the database.",
                 "parameters": [
                     {
-                        "name": "id",
+                        "name": "courseId",
                         "in": "path",
                         "required": true,
                         "schema": {
                             "type": "string"
-                        }
+                        },
+                        "description": "Course ID to retrieve"
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "Course retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CourseResponse"
+                                }
+                            },
+                            "application/xml": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CourseResponse"
+                                }
+                            }
+                        }
                     },
                     "404": {
-                        "description": "Not Found"
+                        "description": "Not found - Course with specified ID does not exist",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NotFoundErrorResponse"
+                                }
+                            },
+                            "application/xml": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NotFoundErrorResponse"
+                                }
+                            }
+                        }
                     },
                     "500": {
                         "description": "Internal Server Error"
@@ -162,88 +216,151 @@
             },
             "put": {
                 "tags": ["Courses"],
-                "description": "Update an existing course by ID",
+                "summary": "Update an existing course",
+                "description": "Update an existing course by its ID.",
                 "parameters": [
                     {
-                        "name": "id",
+                        "name": "courseId",
                         "in": "path",
                         "required": true,
                         "schema": {
                             "type": "string"
-                        },
-                        "description": "MongoDB _id of the course to update"
+                        }
                     }
                 ],
+                "responses": {
+                    "200": {
+                        "description": "Course updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CourseResponse"
+                                }
+                            },
+                            "application/xml": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CourseResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Invalid or missing input data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationErrorResponse"
+                                }
+                            },
+                            "application/xml": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Authentication required to update a course",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthenticationErrorResponse"
+                                }
+                            },
+                            "application/xml": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthenticationErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found - Course with specified ID does not exist",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NotFoundErrorResponse"
+                                }
+                            },
+                            "application/xml": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NotFoundErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
                 "requestBody": {
                     "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
-                                "type": "object",
-                                "properties": {
-                                    "courseId": {
-                                        "example": "CA101"
-                                    },
-                                    "courseName": {
-                                        "example": "Calculus 101"
-                                    },
-                                    "deptId": {
-                                        "example": "64f1b2bcd9a3e1f1a2345678"
-                                    },
-                                    "teacherId": {
-                                        "example": "64f1c3d4e5f6789123456789"
-                                    },
-                                    "credits": {
-                                        "example": 4
-                                    }
-                                },
-                                "required": [
-                                    "courseName",
-                                    "deptId",
-                                    "teacherId",
-                                    "credits"
-                                ]
+                                "$ref": "#/components/schemas/CourseInput"
                             }
                         }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "400": {
-                        "description": "Bad Request"
-                    },
-                    "401": {
-                        "description": "Unauthorized"
-                    },
-                    "404": {
-                        "description": "Not Found"
                     }
                 }
             },
             "delete": {
                 "tags": ["Courses"],
-                "description": "",
+                "summary": "Delete an existing course",
+                "description": "Delete an existing course by its ID.",
                 "parameters": [
                     {
-                        "name": "id",
+                        "name": "courseId",
                         "in": "path",
                         "required": true,
                         "schema": {
                             "type": "string"
-                        }
+                        },
+                        "description": "Course ID to delete"
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "Course deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CourseResponse"
+                                }
+                            },
+                            "application/xml": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CourseResponse"
+                                }
+                            }
+                        }
                     },
                     "401": {
-                        "description": "Unauthorized"
+                        "description": "Unauthorized - Authentication required to delete a course",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthenticationErrorResponse"
+                                }
+                            },
+                            "application/xml": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthenticationErrorResponse"
+                                }
+                            }
+                        }
                     },
                     "404": {
-                        "description": "Not Found"
+                        "description": "Not found - Course with specified ID does not exist",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NotFoundErrorResponse"
+                                }
+                            },
+                            "application/xml": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NotFoundErrorResponse"
+                                }
+                            }
+                        }
                     },
                     "500": {
                         "description": "Internal Server Error"
@@ -298,7 +415,7 @@
                         }
                     },
                     "400": {
-                        "description": "Bad request - Invalid input data",
+                        "description": "Bad request - Invalid or missing input data",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -313,10 +430,22 @@
                         }
                     },
                     "401": {
-                        "description": "Unauthorized"
+                        "description": "Unauthorized - Authentication required to create a department",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthenticationErrorResponse"
+                                }
+                            },
+                            "application/xml": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthenticationErrorResponse"
+                                }
+                            }
+                        }
                     },
                     "409": {
-                        "description": "Conflict - Department with same ID already exists",
+                        "description": "Conflict - Department with specified ID already exists",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -343,19 +472,20 @@
                 }
             }
         },
-        "/departments/{id}": {
+        "/departments/{deptId}": {
             "get": {
                 "tags": ["Departments"],
                 "summary": "Get a department by ID",
                 "description": "Retrieves a single department by its ID from the database.",
                 "parameters": [
                     {
-                        "name": "id",
+                        "name": "deptId",
                         "in": "path",
                         "required": true,
                         "schema": {
                             "type": "string"
-                        }
+                        },
+                        "description": "Deparment ID to retrieve"
                     }
                 ],
                 "responses": {
@@ -400,7 +530,7 @@
                 "description": "Update an existing department by its ID.",
                 "parameters": [
                     {
-                        "name": "id",
+                        "name": "deptId",
                         "in": "path",
                         "required": true,
                         "schema": {
@@ -425,7 +555,7 @@
                         }
                     },
                     "400": {
-                        "description": "Bad request - Invalid input data",
+                        "description": "Bad request - Invalid or missing input data",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -440,7 +570,19 @@
                         }
                     },
                     "401": {
-                        "description": "Unauthorized"
+                        "description": "Unauthorized - Authentication required to update a department",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthenticationErrorResponse"
+                                }
+                            },
+                            "application/xml": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthenticationErrorResponse"
+                                }
+                            }
+                        }
                     },
                     "404": {
                         "description": "Not found - Department with specified ID does not exist",
@@ -475,21 +617,13 @@
                 "description": "Delete a department by its ID from the database.",
                 "parameters": [
                     {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
                         "name": "deptId",
                         "in": "path",
-                        "description": "Deparment ID to delete",
                         "required": true,
                         "schema": {
                             "type": "string"
-                        }
+                        },
+                        "description": "Deparment ID to delete"
                     }
                 ],
                 "responses": {
@@ -509,7 +643,19 @@
                         }
                     },
                     "401": {
-                        "description": "Unauthorized"
+                        "description": "Unauthorized - Authentication required to delete a department",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthenticationErrorResponse"
+                                }
+                            },
+                            "application/xml": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthenticationErrorResponse"
+                                }
+                            }
+                        }
                     },
                     "404": {
                         "description": "Not found - Department with specified ID does not exist",
@@ -535,11 +681,16 @@
         "/students/": {
             "get": {
                 "tags": ["Students"],
-                "description": "",
+                "summary": "Get all students",
+                "description": "Retrieve all students, optionally filtering by enrollment status or major.",
                 "parameters": [
                     {
                         "name": "status",
                         "in": "query",
+                        "description": "Filter students by enrollment status (active, graduated, withdrawn)",
+                        "required": false,
+                        "enum": ["active", "graduated", "withdrawn"],
+                        "default": "active",
                         "schema": {
                             "type": "string"
                         }
@@ -547,6 +698,8 @@
                     {
                         "name": "major",
                         "in": "query",
+                        "description": "Filter students by major",
+                        "required": false,
                         "schema": {
                             "type": "string"
                         }
@@ -554,7 +707,22 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "Students retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/StudentsResponse"
+                                }
+                            },
+                            "application/xml": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/StudentsResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found"
                     },
                     "500": {
                         "description": "Internal Server Error"
@@ -563,78 +731,131 @@
             },
             "post": {
                 "tags": ["Students"],
-                "description": "",
+                "summary": "Create a new student",
+                "description": "Create a new student in the database.",
                 "responses": {
                     "201": {
-                        "description": "Created"
+                        "description": "Student created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/StudentResponse"
+                                }
+                            },
+                            "application/xml": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/StudentResponse"
+                                }
+                            }
+                        }
                     },
                     "400": {
-                        "description": "Bad Request"
+                        "description": "Bad request - Invalid or missing input data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationErrorResponse"
+                                }
+                            },
+                            "application/xml": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationErrorResponse"
+                                }
+                            }
+                        }
                     },
                     "401": {
-                        "description": "Unauthorized"
+                        "description": "Unauthorized - User must be authenticated to create a student",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthenticationErrorResponse"
+                                }
+                            },
+                            "application/xml": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthenticationErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "409": {
+                        "description": "Conflict - Student with specified ID or email already exists",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConflictErrorResponse"
+                                }
+                            },
+                            "application/xml": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConflictErrorResponse"
+                                }
+                            }
+                        }
                     }
                 },
                 "requestBody": {
+                    "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
-                                "type": "object",
-                                "properties": {
-                                    "studentId": {
-                                        "example": "any"
-                                    },
-                                    "firstName": {
-                                        "example": "any"
-                                    },
-                                    "lastName": {
-                                        "example": "any"
-                                    },
-                                    "email": {
-                                        "example": "any"
-                                    },
-                                    "major": {
-                                        "example": "any"
-                                    },
-                                    "status": {
-                                        "example": "any"
-                                    },
-                                    "GPA": {
-                                        "example": "any"
-                                    },
-                                    "enrollmentDate": {
-                                        "example": "any"
-                                    },
-                                    "courses": {
-                                        "example": "any"
-                                    }
-                                }
+                                "$ref": "#/components/schemas/StudentInput"
                             }
                         }
                     }
                 }
             }
         },
-        "/students/{id}": {
+        "/students/{studentId}": {
             "get": {
                 "tags": ["Students"],
-                "description": "",
+                "summary": "Get a student by ID",
+                "description": "Retrieve a single student by their ID from the database.",
                 "parameters": [
                     {
-                        "name": "id",
+                        "name": "studentId",
                         "in": "path",
                         "required": true,
                         "schema": {
                             "type": "string"
-                        }
+                        },
+                        "description": "Student ID to retrieve"
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "Student retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/StudentResponse"
+                                }
+                            },
+                            "application/xml": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/StudentResponse"
+                                }
+                            }
+                        }
                     },
                     "404": {
-                        "description": "Not Found"
+                        "description": "Not found - Student with specified ID does not exist",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NotFoundErrorResponse"
+                                }
+                            },
+                            "application/xml": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NotFoundErrorResponse"
+                                }
+                            }
+                        }
                     },
                     "500": {
                         "description": "Internal Server Error"
@@ -643,10 +864,11 @@
             },
             "put": {
                 "tags": ["Students"],
-                "description": "",
+                "summary": "Update an existing student",
+                "description": "Update an existing student by their ID.",
                 "parameters": [
                     {
-                        "name": "id",
+                        "name": "studentId",
                         "in": "path",
                         "required": true,
                         "schema": {
@@ -656,41 +878,137 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "Student updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/StudentResponse"
+                                }
+                            },
+                            "application/xml": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/StudentResponse"
+                                }
+                            }
+                        }
                     },
                     "400": {
-                        "description": "Bad Request"
+                        "description": "Bad request - Invalid or missing input data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationErrorResponse"
+                                }
+                            },
+                            "application/xml": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationErrorResponse"
+                                }
+                            }
+                        }
                     },
                     "401": {
-                        "description": "Unauthorized"
+                        "description": "Unauthorized - User must be authenticated to update a student",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthenticationErrorResponse"
+                                }
+                            },
+                            "application/xml": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthenticationErrorResponse"
+                                }
+                            }
+                        }
                     },
                     "404": {
-                        "description": "Not Found"
+                        "description": "Not found - Student with specified ID does not exist",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NotFoundErrorResponse"
+                                }
+                            },
+                            "application/xml": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NotFoundErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StudentInput"
+                            }
+                        }
                     }
                 }
             },
             "delete": {
                 "tags": ["Students"],
-                "description": "",
+                "summary": "Delete an existing student",
+                "description": "Delete an existing student by their ID from the database.",
                 "parameters": [
                     {
-                        "name": "id",
+                        "name": "studentId",
                         "in": "path",
                         "required": true,
                         "schema": {
                             "type": "string"
-                        }
+                        },
+                        "description": "Student ID to delete"
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "Student deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/StudentResponse"
+                                }
+                            },
+                            "application/xml": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/StudentResponse"
+                                }
+                            }
+                        }
                     },
                     "401": {
-                        "description": "Unauthorized"
+                        "description": "Unauthorized - User must be authenticated to delete a student",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthenticationErrorResponse"
+                                }
+                            },
+                            "application/xml": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthenticationErrorResponse"
+                                }
+                            }
+                        }
                     },
                     "404": {
-                        "description": "Not Found"
+                        "description": "Not found - Student with specified ID does not exist",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NotFoundErrorResponse"
+                                }
+                            },
+                            "application/xml": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NotFoundErrorResponse"
+                                }
+                            }
+                        }
                     },
                     "500": {
                         "description": "Internal Server Error"
@@ -756,7 +1074,7 @@
                         }
                     },
                     "400": {
-                        "description": "Bad request - Invalid input data",
+                        "description": "Bad request - Invalid or missing input data",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -771,7 +1089,19 @@
                         }
                     },
                     "401": {
-                        "description": "Unauthorized"
+                        "description": "Unauthorized - Authentication required to create a teacher",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthenticationErrorResponse"
+                                }
+                            },
+                            "application/xml": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthenticationErrorResponse"
+                                }
+                            }
+                        }
                     },
                     "404": {
                         "description": "Not found - Department with specified ID does not exist",
@@ -789,7 +1119,7 @@
                         }
                     },
                     "409": {
-                        "description": "Conflict - Teacher with same ID already exists",
+                        "description": "Conflict - Teacher with specified ID or email already exists",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -816,28 +1146,20 @@
                 }
             }
         },
-        "/teachers/{id}": {
+        "/teachers/{teacherId}": {
             "get": {
                 "tags": ["Teachers"],
                 "summary": "Get a teacher by ID",
                 "description": "Retrieve a single teacher by their ID from the database.",
                 "parameters": [
                     {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
                         "name": "teacherId",
                         "in": "path",
-                        "description": "Teacher ID to retrieve",
                         "required": true,
                         "schema": {
                             "type": "string"
-                        }
+                        },
+                        "description": "Teacher ID to retrieve"
                     }
                 ],
                 "responses": {
@@ -882,7 +1204,7 @@
                 "description": "Update an existing teacher by their ID.",
                 "parameters": [
                     {
-                        "name": "id",
+                        "name": "teacherId",
                         "in": "path",
                         "required": true,
                         "schema": {
@@ -907,7 +1229,7 @@
                         }
                     },
                     "400": {
-                        "description": "Bad request - Invalid input data",
+                        "description": "Bad request - Invalid or missing input data",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -922,7 +1244,19 @@
                         }
                     },
                     "401": {
-                        "description": "Unauthorized"
+                        "description": "Unauthorized - Authentication required to update a teacher",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthenticationErrorResponse"
+                                }
+                            },
+                            "application/xml": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthenticationErrorResponse"
+                                }
+                            }
+                        }
                     },
                     "404": {
                         "description": "Not found - Department / Teacher with specified ID does not exist",
@@ -957,21 +1291,13 @@
                 "description": "Delete a teacher by their ID from the database,",
                 "parameters": [
                     {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
                         "name": "teacherId",
                         "in": "path",
-                        "description": "Teacher ID to delete",
                         "required": true,
                         "schema": {
                             "type": "string"
-                        }
+                        },
+                        "description": "Teacher ID to delete"
                     }
                 ],
                 "responses": {
@@ -991,7 +1317,19 @@
                         }
                     },
                     "401": {
-                        "description": "Unauthorized"
+                        "description": "Unauthorized - Authentication required to delete a teacher",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthenticationErrorResponse"
+                                }
+                            },
+                            "application/xml": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthenticationErrorResponse"
+                                }
+                            }
+                        }
                     },
                     "404": {
                         "description": "Not found - Teacher with specified ID does not exist",
@@ -1343,9 +1681,13 @@
                                             },
                                             "description": {
                                                 "type": "string",
-                                                "example": "Array of course identifiers taught by the teacher"
+                                                "example": "Course ID (e.g., CSE_110)"
                                             }
                                         }
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "List of course IDs taught by the teacher"
                                     }
                                 }
                             }
@@ -1359,36 +1701,31 @@
             "TeacherInput": {
                 "type": "object",
                 "properties": {
-                    "example": {
-                        "type": "object",
-                        "properties": {
-                            "teacherId": {
-                                "type": "string",
-                                "example": "T001"
-                            },
-                            "firstName": {
-                                "type": "string",
-                                "example": "Michael"
-                            },
-                            "lastName": {
-                                "type": "string",
-                                "example": "Brown"
-                            },
-                            "email": {
-                                "type": "string",
-                                "example": "michael.brown@example.com"
-                            },
-                            "deptId": {
-                                "type": "string",
-                                "example": "CSEE"
-                            },
-                            "courses": {
-                                "type": "array",
-                                "example": ["CSE_110", "CSE_120"],
-                                "items": {
-                                    "type": "string"
-                                }
-                            }
+                    "teacherId": {
+                        "type": "string",
+                        "example": "T001"
+                    },
+                    "firstName": {
+                        "type": "string",
+                        "example": "Michael"
+                    },
+                    "lastName": {
+                        "type": "string",
+                        "example": "Brown"
+                    },
+                    "email": {
+                        "type": "string",
+                        "example": "michael.brown@example.com"
+                    },
+                    "deptId": {
+                        "type": "string",
+                        "example": "CSEE"
+                    },
+                    "courses": {
+                        "type": "array",
+                        "example": ["CSE_110", "CSE_120"],
+                        "items": {
+                            "type": "string"
                         }
                     }
                 },
@@ -1505,6 +1842,558 @@
                 },
                 "xml": {
                     "name": "TeachersResponse"
+                }
+            },
+            "Student": {
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "example": "object"
+                    },
+                    "properties": {
+                        "type": "object",
+                        "properties": {
+                            "_id": {
+                                "type": "object",
+                                "properties": {
+                                    "type": {
+                                        "type": "string",
+                                        "example": "string"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "MongoDB generated unique identifier"
+                                    }
+                                }
+                            },
+                            "studentId": {
+                                "type": "object",
+                                "properties": {
+                                    "type": {
+                                        "type": "string",
+                                        "example": "string"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Custom student identifier"
+                                    }
+                                }
+                            },
+                            "firstName": {
+                                "type": "object",
+                                "properties": {
+                                    "type": {
+                                        "type": "string",
+                                        "example": "string"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "First name of student"
+                                    }
+                                }
+                            },
+                            "lastName": {
+                                "type": "object",
+                                "properties": {
+                                    "type": {
+                                        "type": "string",
+                                        "example": "string"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Last name of student"
+                                    }
+                                }
+                            },
+                            "email": {
+                                "type": "object",
+                                "properties": {
+                                    "type": {
+                                        "type": "string",
+                                        "example": "string"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Email address of student"
+                                    }
+                                }
+                            },
+                            "major": {
+                                "type": "object",
+                                "properties": {
+                                    "type": {
+                                        "type": "string",
+                                        "example": "string"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Major field of study"
+                                    }
+                                }
+                            },
+                            "status": {
+                                "type": "object",
+                                "properties": {
+                                    "type": {
+                                        "type": "string",
+                                        "example": "string"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Enrollment status of student"
+                                    }
+                                }
+                            },
+                            "GPA": {
+                                "type": "object",
+                                "properties": {
+                                    "type": {
+                                        "type": "string",
+                                        "example": "number"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Grade Point Average of student"
+                                    }
+                                }
+                            },
+                            "enrollmentDate": {
+                                "type": "object",
+                                "properties": {
+                                    "type": {
+                                        "type": "string",
+                                        "example": "string"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Enrollment date of student"
+                                    }
+                                }
+                            },
+                            "courses": {
+                                "type": "object",
+                                "properties": {
+                                    "type": {
+                                        "type": "string",
+                                        "example": "array"
+                                    },
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "type": {
+                                                "type": "string",
+                                                "example": "string"
+                                            },
+                                            "description": {
+                                                "type": "string",
+                                                "example": "Course ID (e.g., CSE_110)"
+                                            }
+                                        }
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "List of course IDs enrolled by the student"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "xml": {
+                    "name": "Student"
+                }
+            },
+            "StudentInput": {
+                "type": "object",
+                "properties": {
+                    "studentId": {
+                        "type": "string",
+                        "example": "S001"
+                    },
+                    "firstName": {
+                        "type": "string",
+                        "example": "Student"
+                    },
+                    "lastName": {
+                        "type": "string",
+                        "example": "One"
+                    },
+                    "email": {
+                        "type": "string",
+                        "example": "student.one@example.com"
+                    },
+                    "major": {
+                        "type": "string",
+                        "example": "Computer Science"
+                    },
+                    "status": {
+                        "type": "string",
+                        "example": "active"
+                    },
+                    "GPA": {
+                        "type": "number",
+                        "example": 3.5
+                    },
+                    "enrollmentDate": {
+                        "type": "string",
+                        "example": "2023-01-01"
+                    },
+                    "courses": {
+                        "type": "array",
+                        "example": ["CSE_110", "CSE_120"],
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "xml": {
+                    "name": "StudentInput"
+                }
+            },
+            "StudentResponse": {
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "example": "object"
+                    },
+                    "properties": {
+                        "type": "object",
+                        "properties": {
+                            "success": {
+                                "type": "object",
+                                "properties": {
+                                    "type": {
+                                        "type": "string",
+                                        "example": "boolean"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Indicates if the operation was successful"
+                                    }
+                                }
+                            },
+                            "message": {
+                                "type": "object",
+                                "properties": {
+                                    "type": {
+                                        "type": "string",
+                                        "example": "string"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Response message"
+                                    }
+                                }
+                            },
+                            "data": {
+                                "xml": {
+                                    "name": "student"
+                                },
+                                "$ref": "#/components/schemas/Student"
+                            }
+                        }
+                    }
+                },
+                "xml": {
+                    "name": "StudentResponse"
+                }
+            },
+            "StudentsResponse": {
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "example": "object"
+                    },
+                    "properties": {
+                        "type": "object",
+                        "properties": {
+                            "success": {
+                                "type": "object",
+                                "properties": {
+                                    "type": {
+                                        "type": "string",
+                                        "example": "boolean"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Indicates if the operation was successful"
+                                    }
+                                }
+                            },
+                            "message": {
+                                "type": "object",
+                                "properties": {
+                                    "type": {
+                                        "type": "string",
+                                        "example": "string"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Response message"
+                                    }
+                                }
+                            },
+                            "data": {
+                                "type": "object",
+                                "properties": {
+                                    "type": {
+                                        "type": "string",
+                                        "example": "array"
+                                    },
+                                    "items": {
+                                        "xml": {
+                                            "name": "student"
+                                        },
+                                        "$ref": "#/components/schemas/Student"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Array of student objects"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "xml": {
+                    "name": "StudentsResponse"
+                }
+            },
+            "Course": {
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "example": "object"
+                    },
+                    "properties": {
+                        "type": "object",
+                        "properties": {
+                            "_id": {
+                                "type": "object",
+                                "properties": {
+                                    "type": {
+                                        "type": "string",
+                                        "example": "string"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "MongoDB generated unique identifier"
+                                    }
+                                }
+                            },
+                            "courseId": {
+                                "type": "object",
+                                "properties": {
+                                    "tpye": {
+                                        "type": "string",
+                                        "example": "string"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Custom course identifier"
+                                    }
+                                }
+                            },
+                            "courseName": {
+                                "type": "object",
+                                "properties": {
+                                    "type": {
+                                        "type": "string",
+                                        "example": "string"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Name of the course"
+                                    }
+                                }
+                            },
+                            "deptId": {
+                                "type": "object",
+                                "properties": {
+                                    "type": {
+                                        "type": "string",
+                                        "example": "string"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Department ID to which the course belongs"
+                                    }
+                                }
+                            },
+                            "teacherId": {
+                                "type": "object",
+                                "properties": {
+                                    "type": {
+                                        "type": "string",
+                                        "example": "string"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Teacher ID who teaches the course"
+                                    }
+                                }
+                            },
+                            "credits": {
+                                "type": "object",
+                                "properties": {
+                                    "type": {
+                                        "type": "string",
+                                        "example": "number"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Number of credits for the course"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "xml": {
+                    "name": "Course"
+                }
+            },
+            "CourseInput": {
+                "type": "object",
+                "properties": {
+                    "courseId": {
+                        "type": "string",
+                        "example": "CSE_110"
+                    },
+                    "courseName": {
+                        "type": "string",
+                        "example": "Introduction to Computer Science"
+                    },
+                    "deptId": {
+                        "type": "string",
+                        "example": "CSEE"
+                    },
+                    "teacherId": {
+                        "type": "string",
+                        "example": "T001"
+                    },
+                    "credits": {
+                        "type": "number",
+                        "example": 3
+                    }
+                },
+                "xml": {
+                    "name": "CourseInput"
+                }
+            },
+            "CourseResponse": {
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "example": "object"
+                    },
+                    "properties": {
+                        "type": "object",
+                        "properties": {
+                            "success": {
+                                "type": "object",
+                                "properties": {
+                                    "type": {
+                                        "type": "string",
+                                        "example": "boolean"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Indicates if the operation was successful"
+                                    }
+                                }
+                            },
+                            "message": {
+                                "type": "object",
+                                "properties": {
+                                    "type": {
+                                        "type": "string",
+                                        "example": "string"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Response message"
+                                    }
+                                }
+                            },
+                            "data": {
+                                "xml": {
+                                    "name": "course"
+                                },
+                                "$ref": "#/components/schemas/Course"
+                            }
+                        }
+                    }
+                },
+                "xml": {
+                    "name": "CourseResponse"
+                }
+            },
+            "CoursesResponse": {
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "example": "object"
+                    },
+                    "properties": {
+                        "type": "object",
+                        "properties": {
+                            "success": {
+                                "type": "object",
+                                "properties": {
+                                    "type": {
+                                        "type": "string",
+                                        "example": "boolean"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Indicates if the operation was successful"
+                                    }
+                                }
+                            },
+                            "message": {
+                                "type": "object",
+                                "properties": {
+                                    "type": {
+                                        "type": "string",
+                                        "example": "string"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Response message"
+                                    }
+                                }
+                            },
+                            "data": {
+                                "type": "object",
+                                "properties": {
+                                    "type": {
+                                        "type": "string",
+                                        "example": "array"
+                                    },
+                                    "items": {
+                                        "xml": {
+                                            "name": "course"
+                                        },
+                                        "$ref": "#/components/schemas/Course"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Array of course objects"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "xml": {
+                    "name": "CoursesResponse"
                 }
             },
             "ErrorResponse": {
@@ -1807,6 +2696,62 @@
                 },
                 "xml": {
                     "name": "NotFoundErrorResponse"
+                }
+            },
+            "AuthenticationErrorResponse": {
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "example": "object"
+                    },
+                    "properties": {
+                        "type": "object",
+                        "properties": {
+                            "success": {
+                                "type": "object",
+                                "properties": {
+                                    "type": {
+                                        "type": "string",
+                                        "example": "boolean"
+                                    },
+                                    "example": {
+                                        "type": "boolean",
+                                        "example": false
+                                    }
+                                }
+                            },
+                            "message": {
+                                "type": "object",
+                                "properties": {
+                                    "type": {
+                                        "type": "string",
+                                        "example": "string"
+                                    },
+                                    "example": {
+                                        "type": "string",
+                                        "example": "Authentication required"
+                                    }
+                                }
+                            },
+                            "error": {
+                                "type": "object",
+                                "properties": {
+                                    "type": {
+                                        "type": "string",
+                                        "example": "string"
+                                    },
+                                    "example": {
+                                        "type": "string",
+                                        "example": "Invalid or missing authentication token"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "xml": {
+                    "name": "AuthenticationErrorResponse"
                 }
             }
         }

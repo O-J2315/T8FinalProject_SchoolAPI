@@ -13,7 +13,12 @@ const teacherSchema = new mongoose.Schema({
         trim: true,
     },
     deptId: { type: String, required: true },
-    courses: [{ type: String }],
+    dept: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Department",
+        required: true,
+    },
+    courses: [{ type: mongoose.Schema.Types.ObjectId, ref: "Course" }],
 });
 
 module.exports = mongoose.model("Teacher", teacherSchema);

@@ -33,9 +33,9 @@ const teacherDefinitions = {
                 type: "array",
                 items: {
                     type: "string",
-                    description:
-                        "Array of course identifiers taught by the teacher",
+                    description: "Course ID (e.g., CSE_110)",
                 },
+                description: "List of course IDs taught by the teacher",
             },
         },
     },
@@ -44,14 +44,12 @@ const teacherDefinitions = {
     // --------------------------------------------------
     // Teacher input definition for creating a new teacher
     TeacherInput: {
-        example: {
-            teacherId: "T001",
-            firstName: "Michael",
-            lastName: "Brown",
-            email: "michael.brown@example.com",
-            deptId: "CSEE",
-            courses: ["CSE_110", "CSE_120"],
-        },
+        teacherId: "T001",
+        firstName: "Michael",
+        lastName: "Brown",
+        email: "michael.brown@example.com",
+        deptId: "CSEE",
+        courses: ["CSE_110", "CSE_120"],
     },
 
     // R E S P O N S E / S

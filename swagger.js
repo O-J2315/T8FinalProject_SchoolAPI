@@ -14,16 +14,15 @@ const doc = {
     consumes: ["application/json"],
     produces: ["application/json"],
     tags: [
-        { name: "Home", description: "Home page" },
         {
             name: "Departments",
             description: "Department management operations",
         },
         { name: "Teachers", description: "Teacher management operations" },
-        { name: "Courses", description: "Course management operations (WIP)" },
+        { name: "Courses", description: "Course management operations" },
         {
             name: "Students",
-            description: "Student management operations (WIP)",
+            description: "Student management operations",
         },
     ],
     definitions: definitions,

@@ -106,6 +106,27 @@ const commonDefinitions = {
             },
         },
     },
+
+    // A U T H E N T I C A T I O N
+    // --------------------------------------------------
+    // Authentication error response definition
+    AuthenticationErrorResponse: {
+        type: "object",
+        properties: {
+            success: {
+                type: "boolean",
+                example: false,
+            },
+            message: {
+                type: "string",
+                example: "Authentication required",
+            },
+            error: {
+                type: "string",
+                example: "Invalid or missing authentication token",
+            },
+        },
+    },
 };
 
 module.exports = commonDefinitions;
