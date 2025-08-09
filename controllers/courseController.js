@@ -8,7 +8,9 @@ const courseBaseSchema = {
     courseId: Joi.string().alphanum().min(2).max(20).required(),
     courseName: Joi.string().min(2).max(100).trim().required().disallow(""),
     deptId: Joi.string().alphanum().required().disallow(""),
+    dept: Joi.string().optional(),
     teacherId: Joi.string().alphanum().required().disallow(""),
+    teacher: Joi.string().optional(),
     credits: Joi.number().integer().min(0).max(10).required(),
 };
 
