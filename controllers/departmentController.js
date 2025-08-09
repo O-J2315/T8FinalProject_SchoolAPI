@@ -1,4 +1,24 @@
 const Department = require("../models/Department");
+const Joi = require("joi");
+
+// Validation schemas
+const departmentBaseSchema = {
+    deptId: Joi.string().alphanum().min(2).max(20),
+    deptName: Joi.string().min(2).max(100).trim(),
+    location: Joi.string().max(100).trim().allow("", null),
+    deptEmail: Joi.string().email().lowercase().trim().allow("", null),
+};
+
+// Create schema - all required except location and deptEmail
+const createDepartmentSchema = Joi.object({
+    deptId: departmentBaseSchema.deptId.required(),
+    deptName: departmentBaseSchema.deptName.required(),
+    location: departmentBaseSchema.location.optional(),
+    deptEmail: departmentBaseSchema.deptEmail.optional(),
+});
+
+// Update schema - all optional, but require at least one field
+const updateDepartmentSchema = Joi.object(departmentBaseSchema).min(1);
 
 // GET all departments
 exports.getDepartments = async (req, res) => {
@@ -27,9 +47,19 @@ exports.getDepartmentById = async (req, res) => {
 // POST create new department
 exports.createDepartment = async (req, res) => {
     try {
+        // Validate request body with Joi
+        const { error } = createDepartmentSchema.validate(req.body, {
+            abortEarly: false,
+        });
+        if (error) {
+            return res
+                .status(400)
+                .json({ errors: error.details.map((e) => e.message) });
+        }
+
         const { deptId, deptName, location, deptEmail } = req.body;
 
-        // Check if deptId already exists
+        // Check if deptId exists
         const existing = await Department.findOne({ deptId });
         if (existing) {
             return res
@@ -43,8 +73,8 @@ exports.createDepartment = async (req, res) => {
             location,
             deptEmail,
         });
-
         await newDepartment.save();
+
         res.status(201).json(newDepartment);
     } catch (error) {
         res.status(400).json({ message: error.message });
@@ -54,6 +84,16 @@ exports.createDepartment = async (req, res) => {
 // PUT update department by deptId
 exports.updateDepartment = async (req, res) => {
     try {
+        // Validate update data
+        const { error } = updateDepartmentSchema.validate(req.body, {
+            abortEarly: false,
+        });
+        if (error) {
+            return res
+                .status(400)
+                .json({ errors: error.details.map((e) => e.message) });
+        }
+
         const { deptId } = req.params;
         const updateData = req.body;
 
@@ -66,6 +106,7 @@ exports.updateDepartment = async (req, res) => {
         if (!updatedDepartment) {
             return res.status(404).json({ message: "Department not found" });
         }
+
         res.json(updatedDepartment);
     } catch (error) {
         res.status(400).json({ message: error.message });

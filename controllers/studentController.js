@@ -1,22 +1,61 @@
 const Student = require("../models/Student");
 const Course = require("../models/Course");
 const Department = require("../models/Department");
+const Joi = require("joi");
+
+// Validation schemas
+const createStudentSchema = Joi.object({
+    studentId: Joi.string().alphanum().min(3).max(20).required(),
+    firstName: Joi.string().min(2).max(50).required(),
+    lastName: Joi.string().min(2).max(50).required(),
+    email: Joi.string().email().required(),
+    major: Joi.string().alphanum().required(), // deptId
+    status: Joi.string().valid("active", "inactive", "graduated").required(),
+    GPA: Joi.number().min(0).max(4).required(),
+    enrollmentDate: Joi.date().required(),
+    courses: Joi.array().items(Joi.string().alphanum()).optional(),
+});
+
+const updateStudentSchema = Joi.object({
+    firstName: Joi.string().min(2).max(50),
+    lastName: Joi.string().min(2).max(50),
+    email: Joi.string().email(),
+    major: Joi.string().alphanum(), // deptId
+    status: Joi.string().valid("active", "inactive", "graduated"),
+    GPA: Joi.number().min(0).max(4),
+    enrollmentDate: Joi.date(),
+    courses: Joi.array().items(Joi.string().alphanum()),
+}).min(1); // Require at least one field for update
+
+const studentQuerySchema = Joi.object({
+    status: Joi.string().valid("active", "inactive", "graduated").optional(),
+    major: Joi.string().alphanum().optional(),
+});
 
 // GET all students or filter by status or major
 exports.getStudents = async (req, res) => {
     try {
+        // Joi validation for query params
+        const { error } = studentQuerySchema.validate(req.query, {
+            abortEarly: false,
+        });
+        if (error) {
+            return res
+                .status(400)
+                .json({ errors: error.details.map((e) => e.message) });
+        }
+
         const { status, major } = req.query;
         const filter = {};
 
         if (status) filter.status = status;
 
-        // If filtering by deptId for major
         if (major) {
             const department = await Department.findOne({ deptId: major });
             if (!department) {
                 return res
                     .status(404)
-                    .json({ message: "Invalid major(deptId)" });
+                    .json({ message: "Invalid major (deptId)" });
             }
             filter.major = department._id;
         }
@@ -24,6 +63,7 @@ exports.getStudents = async (req, res) => {
         const students = await Student.find(filter)
             .populate("major", "deptId deptName")
             .populate("courses", "courseId courseName");
+
         res.json(students);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -51,18 +91,29 @@ exports.getStudentById = async (req, res) => {
 // POST create a new student
 exports.createStudent = async (req, res) => {
     try {
+        // Joi validation
+        const { error } = createStudentSchema.validate(req.body, {
+            abortEarly: false,
+        });
+        if (error) {
+            return res
+                .status(400)
+                .json({ errors: error.details.map((e) => e.message) });
+        }
+
         const {
             studentId,
             firstName,
             lastName,
             email,
-            major, // deptId
+            major,
             status,
             GPA,
             enrollmentDate,
             courses,
         } = req.body;
 
+        // Check if studentId already exists
         const existing = await Student.findOne({ studentId });
         if (existing) {
             return res
@@ -70,7 +121,7 @@ exports.createStudent = async (req, res) => {
                 .json({ message: "Student ID already exists" });
         }
 
-        // Resolve major reference via deptId
+        // Resolve major reference
         const department = await Department.findOne({ deptId: major });
         if (!department) {
             return res
@@ -78,7 +129,7 @@ exports.createStudent = async (req, res) => {
                 .json({ message: "Invalid department ID for major" });
         }
 
-        // Resolve courses references via courseIds
+        // Resolve courses
         let courseRefs = [];
         if (courses && courses.length > 0) {
             const courseDocs = await Course.find({
@@ -107,7 +158,7 @@ exports.createStudent = async (req, res) => {
         await newStudent.save();
         res.status(201).json(newStudent);
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        res.status(500).json({ message: error.message });
     }
 };
 
@@ -115,9 +166,20 @@ exports.createStudent = async (req, res) => {
 exports.updateStudent = async (req, res) => {
     try {
         const { studentId } = req.params;
-        const updateData = req.body;
 
-        // Resolve major reference via deptId if updating major
+        // Joi validation
+        const { error } = updateStudentSchema.validate(req.body, {
+            abortEarly: false,
+        });
+        if (error) {
+            return res
+                .status(400)
+                .json({ errors: error.details.map((e) => e.message) });
+        }
+
+        const updateData = { ...req.body };
+
+        // Resolve major reference
         if (updateData.major) {
             const department = await Department.findOne({
                 deptId: updateData.major,
@@ -130,7 +192,7 @@ exports.updateStudent = async (req, res) => {
             updateData.major = department._id;
         }
 
-        // Resolve courses references via courseIds if updating courses
+        // Resolve courses
         if (Array.isArray(updateData.courses)) {
             if (updateData.courses.length > 0) {
                 const courseDocs = await Course.find({
@@ -143,17 +205,14 @@ exports.updateStudent = async (req, res) => {
                 }
                 updateData.courses = courseDocs.map((c) => c._id);
             } else {
-                updateData.courses = []; // clear if passed as empty
+                updateData.courses = [];
             }
         }
 
         const updatedStudent = await Student.findOneAndUpdate(
             { studentId },
             updateData,
-            {
-                new: true,
-                runValidators: true,
-            }
+            { new: true, runValidators: true }
         );
 
         if (!updatedStudent) {
@@ -162,7 +221,7 @@ exports.updateStudent = async (req, res) => {
 
         res.json(updatedStudent);
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        res.status(500).json({ message: error.message });
     }
 };
 

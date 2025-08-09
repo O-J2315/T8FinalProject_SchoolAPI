@@ -1,10 +1,48 @@
 const Course = require("../models/Course");
 const Department = require("../models/Department");
 const Teacher = require("../models/Teacher");
+const Joi = require("joi");
+
+// Base schema (no required here, used for update)
+const courseBaseSchema = {
+    courseId: Joi.string().alphanum().min(2).max(20),
+    courseName: Joi.string().min(2).max(100).trim(),
+    dept: Joi.string().hex().length(24), // MongoDB ObjectId string
+    teacher: Joi.string().hex().length(24), // MongoDB ObjectId string
+    credits: Joi.number().integer().min(0).max(10),
+};
+
+// Create schema - required fields
+const createCourseSchema = Joi.object({
+    courseId: courseBaseSchema.courseId.required(),
+    courseName: courseBaseSchema.courseName.required(),
+    dept: courseBaseSchema.dept.required(),
+    teacher: courseBaseSchema.teacher.required(),
+    credits: courseBaseSchema.credits.required(),
+});
+
+// Update schema - all optional but at least one required
+const updateCourseSchema = Joi.object(courseBaseSchema).min(1);
+
+// Query schema for filtering GET /courses
+const courseQuerySchema = Joi.object({
+    teacherId: Joi.string().alphanum().min(2).max(20).optional(),
+    deptId: Joi.string().alphanum().min(2).max(20).optional(),
+});
 
 // GET all
 exports.getCourses = async (req, res) => {
     try {
+        // Validate query params
+        const { error } = courseQuerySchema.validate(req.query, {
+            abortEarly: false,
+        });
+        if (error) {
+            return res
+                .status(400)
+                .json({ errors: error.details.map((e) => e.message) });
+        }
+
         const { teacherId, deptId } = req.query;
         const filter = {};
 
@@ -16,7 +54,6 @@ exports.getCourses = async (req, res) => {
             filter.teacher = teacher._id;
         }
 
-        // If filtering by deptId
         if (deptId) {
             const department = await Department.findOne({ deptId });
             if (!department) {
@@ -57,8 +94,19 @@ exports.getCourseById = async (req, res) => {
 // POST create a new course
 exports.createCourse = async (req, res) => {
     try {
+        // Validate request body
+        const { error } = createCourseSchema.validate(req.body, {
+            abortEarly: false,
+        });
+        if (error) {
+            return res
+                .status(400)
+                .json({ errors: error.details.map((e) => e.message) });
+        }
+
         const { courseId, courseName, dept, teacher, credits } = req.body;
 
+        // Check courseId duplicate
         const existing = await Course.findOne({ courseId });
         if (existing) {
             return res
@@ -66,11 +114,13 @@ exports.createCourse = async (req, res) => {
                 .json({ message: "Course ID already exists" });
         }
 
+        // Check department exists
         const department = await Department.findById(dept);
         if (!department) {
             return res.status(404).json({ message: "Invalid department ID" });
         }
 
+        // Check teacher exists
         const targetTeacher = await Teacher.findById(teacher);
         if (!targetTeacher) {
             return res.status(404).json({ message: "Invalid teacher ID" });
@@ -95,7 +145,18 @@ exports.createCourse = async (req, res) => {
 exports.updateCourse = async (req, res) => {
     try {
         const { courseId } = req.params;
-        const updateData = req.body;
+
+        // Validate update body
+        const { error } = updateCourseSchema.validate(req.body, {
+            abortEarly: false,
+        });
+        if (error) {
+            return res
+                .status(400)
+                .json({ errors: error.details.map((e) => e.message) });
+        }
+
+        const updateData = { ...req.body };
 
         if (updateData.dept) {
             const department = await Department.findById(updateData.dept);
@@ -108,24 +169,23 @@ exports.updateCourse = async (req, res) => {
         }
 
         if (updateData.teacher) {
-            const target_teacher = await Teacher.findById(updateData.teacher);
-            if (!target_teacher) {
+            const targetTeacher = await Teacher.findById(updateData.teacher);
+            if (!targetTeacher) {
                 return res.status(404).json({ message: "Invalid teacher ID" });
             }
-            updateData.teacher = target_teacher._id;
+            updateData.teacher = targetTeacher._id;
         }
 
-        const updatedCourse = await Course.findByIdAndUpdate(
-            courseId,
+        const updatedCourse = await Course.findOneAndUpdate(
+            { courseId },
             updateData,
-            {
-                new: true,
-                runValidators: true,
-            }
+            { new: true, runValidators: true }
         );
 
-        if (!updatedCourse)
+        if (!updatedCourse) {
             return res.status(404).json({ message: "Course not found" });
+        }
+
         res.json(updatedCourse);
     } catch (error) {
         res.status(400).json({ message: error.message });

@@ -1,6 +1,25 @@
 const Teacher = require("../models/Teacher");
 const Department = require("../models/Department");
 const Course = require("../models/Course");
+const Joi = require("joi");
+
+//Teacher validation schema
+const teacherValidationSchema = Joi.object({
+    teacherId: Joi.string().alphanum().min(3).max(20).required(),
+    firstName: Joi.string().min(2).max(50).required(),
+    lastName: Joi.string().min(2).max(50).required(),
+    email: Joi.string().email().required(),
+    deptId: Joi.string().alphanum().required(),
+    dept: Joi.string().hex().length(24).required(),
+    courses: Joi.array().items(Joi.string().hex().length(24)),
+});
+const teacherUpdateSchema = Joi.object({
+    firstName: Joi.string().min(2).max(50).optional(),
+    lastName: Joi.string().min(2).max(50).optional(),
+    email: Joi.string().email().optional(),
+    deptId: Joi.string().alphanum().optional(),
+    courses: Joi.array().items(Joi.string().alphanum()).optional(),
+}).min(1); // Require at least one field
 
 // GET all teachers or filter by deptId
 exports.getTeachers = async (req, res) => {
@@ -40,10 +59,18 @@ exports.getTeacherById = async (req, res) => {
 // POST create new teacher
 exports.createTeacher = async (req, res) => {
     try {
+        const { error } = teacherValidationSchema.validate(req.body, {
+            abortEarly: false,
+        });
+        if (error) {
+            return res.status(400).json({
+                errors: error.details.map((err) => err.message),
+            });
+        }
+
         const { teacherId, firstName, lastName, email, deptId, courses } =
             req.body;
 
-        //Check if teacherId already exists
         const existing = await Teacher.findOne({ teacherId });
         if (existing) {
             return res
@@ -51,13 +78,16 @@ exports.createTeacher = async (req, res) => {
                 .json({ message: "Teacher ID already exists" });
         }
 
-        // Resolve dept reference via deptId
+        const existingEmail = await Teacher.findOne({ email });
+        if (existingEmail) {
+            return res.status(400).json({ message: "Email already exists" });
+        }
+
         const department = await Department.findOne({ deptId });
         if (!department) {
             return res.status(400).json({ message: "Invalid department ID" });
         }
 
-        // Resolve courses references
         let courseRefs = [];
         if (courses && courses.length > 0) {
             const courseDocs = await Course.find({
@@ -77,24 +107,34 @@ exports.createTeacher = async (req, res) => {
             lastName,
             email,
             deptId,
-            dept: department._id, // reference to Department
-            courses: courseRefs, // reference to Course
+            dept: department._id,
+            courses: courseRefs,
         });
 
         await newTeacher.save();
+
         res.status(201).json(newTeacher);
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        res.status(500).json({ message: error.message });
     }
 };
 
-// PUT update teacher by teacherId
+// PATCH update existing teacher
 exports.updateTeacher = async (req, res) => {
     try {
         const { teacherId } = req.params;
-        const updateData = req.body;
 
-        // Resolve dept reference if updating deptId
+        const { error } = teacherUpdateSchema.validate(req.body, {
+            abortEarly: false,
+        });
+        if (error) {
+            return res.status(400).json({
+                errors: error.details.map((err) => err.message),
+            });
+        }
+
+        const updateData = { ...req.body };
+
         if (updateData.deptId) {
             const department = await Department.findOne({
                 deptId: updateData.deptId,
@@ -104,10 +144,9 @@ exports.updateTeacher = async (req, res) => {
                     .status(400)
                     .json({ message: "Invalid department ID" });
             }
-            updateData.dept = department._id; // updated to actual reference
+            updateData.dept = department._id;
         }
 
-        // Resolve course references if updating courses
         if (Array.isArray(updateData.courses)) {
             if (updateData.courses.length > 0) {
                 const courseDocs = await Course.find({
@@ -118,19 +157,16 @@ exports.updateTeacher = async (req, res) => {
                         .status(400)
                         .json({ message: "One or more invalid course IDs" });
                 }
-                updateData.courses = courseDocs.map((c) => c._id); // update to actual reference
+                updateData.courses = courseDocs.map((c) => c._id);
             } else {
-                updateData.courses = []; // clear if passed as empty
+                updateData.courses = [];
             }
         }
 
         const updatedTeacher = await Teacher.findOneAndUpdate(
             { teacherId },
             updateData,
-            {
-                new: true,
-                runValidators: true,
-            }
+            { new: true, runValidators: true }
         );
 
         if (!updatedTeacher) {
@@ -139,11 +175,10 @@ exports.updateTeacher = async (req, res) => {
 
         res.json(updatedTeacher);
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        res.status(500).json({ message: error.message });
     }
 };
 
-// DELETE teacher by teacherId
 exports.deleteTeacher = async (req, res) => {
     try {
         const { teacherId } = req.params;
