@@ -115,13 +115,13 @@ exports.createCourse = async (req, res) => {
         }
 
         // Check department exists
-        const department = await Department.findById(deptId);
+        const department = await Department.findOne({deptId : deptId});
         if (!department) {
             return res.status(404).json({ message: "Invalid department ID" });
         }
 
         // Check teacher exists
-        const targetTeacher = await Teacher.findById(teacherId);
+        const targetTeacher = await Teacher.findOne({teacherId : teacherId});
         if (!targetTeacher) {
             return res.status(404).json({ message: "Invalid teacher ID" });
         }
