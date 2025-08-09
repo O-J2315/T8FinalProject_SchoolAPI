@@ -16,7 +16,7 @@ const studentSchema = new mongoose.Schema({
     dept: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Department",
-        required: true,
+        required: false,
     },
     status: {
         type: String,
