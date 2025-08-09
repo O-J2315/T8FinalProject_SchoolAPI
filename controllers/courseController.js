@@ -129,8 +129,8 @@ exports.createCourse = async (req, res) => {
         const newCourse = new Course({
             courseId,
             courseName,
-            deptId: department._id,
-            teacherId: targetTeacher._id,
+            deptId,
+            teacherId,
             credits,
         });
 
