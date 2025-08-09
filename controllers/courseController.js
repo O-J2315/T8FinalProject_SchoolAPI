@@ -5,11 +5,11 @@ const Joi = require("joi");
 
 // Base schema (no required here, used for update)
 const courseBaseSchema = {
-  courseId: Joi.string().alphanum().min(2).max(20).required(),
-  courseName: Joi.string().min(2).max(100).trim().required().disallow(""),
-  dept: Joi.string().hex().length(24).required().disallow(""),
-  teacher: Joi.string().hex().length(24).required().disallow(""),
-  credits: Joi.number().integer().min(0).max(10).required(),
+    courseId: Joi.string().alphanum().min(2).max(20).required(),
+    courseName: Joi.string().min(2).max(100).trim().required().disallow(""),
+    dept: Joi.string().hex().length(24).required().disallow(""),
+    teacher: Joi.string().hex().length(24).required().disallow(""),
+    credits: Joi.number().integer().min(0).max(10).required(),
 };
 
 // Create schema - required fields

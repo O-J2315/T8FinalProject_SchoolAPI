@@ -3,10 +3,10 @@ const Joi = require("joi");
 
 // Validation schemas
 const departmentBaseSchema = {
-  deptId: Joi.string().alphanum().min(2).max(20).required(),
-  deptName: Joi.string().min(2).max(100).trim().required(),
-  location: Joi.string().max(100).trim().required().disallow(""),
-  deptEmail: Joi.string().email().lowercase().trim().required().disallow(""),
+    deptId: Joi.string().alphanum().min(2).max(20).required(),
+    deptName: Joi.string().min(2).max(100).trim().required(),
+    location: Joi.string().max(100).trim().required().disallow(""),
+    deptEmail: Joi.string().email().lowercase().trim().required().disallow(""),
 };
 
 // Create schema - all required except location and deptEmail
@@ -27,6 +27,8 @@ exports.getDepartments = async (req, res) => {
         res.json(departments);
     } catch (error) {
         res.status(500).json({ message: error.message });
+    } (error) => {
+        res.status(404).json({ message: error.message });
     }
 };
 

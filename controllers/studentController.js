@@ -5,15 +5,25 @@ const Joi = require("joi");
 
 // Validation schemas
 const createStudentSchema = Joi.object({
-  studentId: Joi.string().alphanum().min(3).max(20).required().trim().disallow(""),
-  firstName: Joi.string().min(2).max(50).required().trim().disallow(""),
-  lastName: Joi.string().min(2).max(50).required().trim().disallow(""),
-  email: Joi.string().email().required().trim().disallow(""),
-  major: Joi.string().alphanum().required().trim().disallow(""), // deptId
-  status: Joi.string().valid("active", "inactive", "graduated").required().trim().disallow(""),
-  GPA: Joi.number().min(0).max(4).required(),
-  enrollmentDate: Joi.date().required(),
-  courses: Joi.array().items(Joi.string().alphanum()).optional(),
+    studentId: Joi.string()
+        .alphanum()
+        .min(3)
+        .max(20)
+        .required()
+        .trim()
+        .disallow(""),
+    firstName: Joi.string().min(2).max(50).required().trim().disallow(""),
+    lastName: Joi.string().min(2).max(50).required().trim().disallow(""),
+    email: Joi.string().email().required().trim().disallow(""),
+    major: Joi.string().alphanum().required().trim().disallow(""), // deptId
+    status: Joi.string()
+        .valid("active", "inactive", "graduated")
+        .required()
+        .trim()
+        .disallow(""),
+    GPA: Joi.number().min(0).max(4).required(),
+    enrollmentDate: Joi.date().required(),
+    courses: Joi.array().items(Joi.string().alphanum()).optional(),
 });
 
 const updateStudentSchema = Joi.object({
