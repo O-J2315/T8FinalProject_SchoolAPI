@@ -3,10 +3,10 @@ const Joi = require("joi");
 
 // Validation schemas
 const departmentBaseSchema = {
-    deptId: Joi.string().alphanum().min(2).max(20),
-    deptName: Joi.string().min(2).max(100).trim(),
-    location: Joi.string().max(100).trim().allow("", null),
-    deptEmail: Joi.string().email().lowercase().trim().allow("", null),
+  deptId: Joi.string().alphanum().min(2).max(20).required(),
+  deptName: Joi.string().min(2).max(100).trim().required(),
+  location: Joi.string().max(100).trim().required().disallow(""),
+  deptEmail: Joi.string().email().lowercase().trim().required().disallow(""),
 };
 
 // Create schema - all required except location and deptEmail

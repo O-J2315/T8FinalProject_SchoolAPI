@@ -5,13 +5,13 @@ const Joi = require("joi");
 
 //Teacher validation schema
 const teacherValidationSchema = Joi.object({
-    teacherId: Joi.string().alphanum().min(3).max(20).required(),
-    firstName: Joi.string().min(2).max(50).required(),
-    lastName: Joi.string().min(2).max(50).required(),
-    email: Joi.string().email().required(),
-    deptId: Joi.string().alphanum().required(),
-    dept: Joi.string().hex().length(24).required(),
-    courses: Joi.array().items(Joi.string().hex().length(24)),
+  teacherId: Joi.string().alphanum().min(3).max(20).required().trim().disallow(""),
+  firstName: Joi.string().min(2).max(50).required().trim().disallow(""),
+  lastName: Joi.string().min(2).max(50).required().trim().disallow(""),
+  email: Joi.string().email().required().trim().disallow(""),
+  deptId: Joi.string().alphanum().required().trim().disallow(""),
+  dept: Joi.string().hex().length(24).required().disallow(""),
+  courses: Joi.array().items(Joi.string().hex().length(24)).optional(),
 });
 const teacherUpdateSchema = Joi.object({
     firstName: Joi.string().min(2).max(50).optional(),
