@@ -13,11 +13,6 @@ const studentSchema = new mongoose.Schema({
         trim: true,
     },
     major: { type: String, required: true }, // Same as deptId in Teacher
-    dept: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Department",
-        required: false,
-    },
     status: {
         type: String,
         enum: ["active", "graduated", "withdrawn"],

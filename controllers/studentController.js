@@ -16,6 +16,7 @@ const createStudentSchema = Joi.object({
     lastName: Joi.string().min(2).max(50).required().trim().disallow(""),
     email: Joi.string().email().required().trim().disallow(""),
     major: Joi.string().alphanum().required().trim().disallow(""), // deptId
+    dept: Joi.string().alphanum().optional(),
     status: Joi.string()
         .valid("active", "inactive", "graduated")
         .required()
