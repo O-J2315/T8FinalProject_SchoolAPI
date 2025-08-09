@@ -8,13 +8,13 @@ const courseSchema = new mongoose.Schema({
     dept: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Department",
-        required: true,
+        required: false,
     },
     teacherId: { type: String, required: true },
     teacher: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Teacher",
-        required: true,
+        required: false,
     },
     credits: { type: Number, required: true, min: 1 },
 });
