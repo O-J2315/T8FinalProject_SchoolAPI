@@ -16,7 +16,6 @@ const teacherValidationSchema = Joi.object({
     lastName: Joi.string().min(2).max(50).required().trim().disallow(""),
     email: Joi.string().email().required().trim().disallow(""),
     deptId: Joi.string().alphanum().required().trim().disallow(""),
-    dept: Joi.string().hex().length(24).required().disallow(""),
     courses: Joi.array().items(Joi.string().hex().length(24)).optional(),
 });
 const teacherUpdateSchema = Joi.object({
