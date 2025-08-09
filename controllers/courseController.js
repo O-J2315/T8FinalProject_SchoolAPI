@@ -16,8 +16,8 @@ const courseBaseSchema = {
 const createCourseSchema = Joi.object({
     courseId: courseBaseSchema.courseId.required(),
     courseName: courseBaseSchema.courseName.required(),
-    dept: courseBaseSchema.dept.required(),
-    teacher: courseBaseSchema.teacher.required(),
+    deptId: courseBaseSchema.deptId.required(),
+    teacherId: courseBaseSchema.teacherId.required(),
     credits: courseBaseSchema.credits.required(),
 });
 
@@ -78,8 +78,8 @@ exports.getCourseById = async (req, res) => {
         const { courseId } = req.params;
 
         const course = await Course.findOne({ courseId })
-            .populate("dept", "deptId deptName")
-            .populate("teacher", "teacherId firstName lastName");
+            .populate("deptId", "deptId deptName")
+            .populate("teacherId", "teacherId firstName lastName");
 
         if (!course) {
             return res.status(404).json({ message: "Course not found" });
@@ -104,7 +104,7 @@ exports.createCourse = async (req, res) => {
                 .json({ errors: error.details.map((e) => e.message) });
         }
 
-        const { courseId, courseName, dept, teacher, credits } = req.body;
+        const { courseId, courseName, deptId, teacherId, credits } = req.body;
 
         // Check courseId duplicate
         const existing = await Course.findOne({ courseId });
@@ -115,13 +115,13 @@ exports.createCourse = async (req, res) => {
         }
 
         // Check department exists
-        const department = await Department.findById(dept);
+        const department = await Department.findById(deptId);
         if (!department) {
             return res.status(404).json({ message: "Invalid department ID" });
         }
 
         // Check teacher exists
-        const targetTeacher = await Teacher.findById(teacher);
+        const targetTeacher = await Teacher.findById(teacherId);
         if (!targetTeacher) {
             return res.status(404).json({ message: "Invalid teacher ID" });
         }
@@ -129,8 +129,8 @@ exports.createCourse = async (req, res) => {
         const newCourse = new Course({
             courseId,
             courseName,
-            dept: department._id,
-            teacher: targetTeacher._id,
+            deptId: department._id,
+            teacherId: targetTeacher._id,
             credits,
         });
 
