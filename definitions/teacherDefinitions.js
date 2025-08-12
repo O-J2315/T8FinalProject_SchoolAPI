@@ -49,7 +49,7 @@ const teacherDefinitions = {
         lastName: "Brown",
         email: "michael.brown@example.com",
         deptId: "CSEE",
-        courses: ["CSE_110", "CSE_120"],
+        courses: ["CSE110", "CSE120"],
     },
 
     // R E S P O N S E / S

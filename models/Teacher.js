@@ -16,7 +16,7 @@ const teacherSchema = new mongoose.Schema({
     dept: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Department",
-        required: true,
+        required: false,
     },
     courses: [{ type: mongoose.Schema.Types.ObjectId, ref: "Course" }],
 });
