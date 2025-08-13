@@ -1681,7 +1681,7 @@
                                             },
                                             "description": {
                                                 "type": "string",
-                                                "example": "Course ID (e.g., CSE_110)"
+                                                "example": "Course ID (e.g., CSE110)"
                                             }
                                         }
                                     },
@@ -1723,7 +1723,7 @@
                     },
                     "courses": {
                         "type": "array",
-                        "example": ["CSE_110", "CSE_120"],
+                        "example": ["CSE110", "CSE120"],
                         "items": {
                             "type": "string"
                         }
@@ -1987,7 +1987,7 @@
                                             },
                                             "description": {
                                                 "type": "string",
-                                                "example": "Course ID (e.g., CSE_110)"
+                                                "example": "Course ID (e.g., CSE110)"
                                             }
                                         }
                                     },
@@ -2041,7 +2041,7 @@
                     },
                     "courses": {
                         "type": "array",
-                        "example": ["CSE_110", "CSE_120"],
+                        "example": ["CSE110", "CSE120"],
                         "items": {
                             "type": "string"
                         }
@@ -2262,7 +2262,7 @@
                 "properties": {
                     "courseId": {
                         "type": "string",
-                        "example": "CSE_110"
+                        "example": "CSE110"
                     },
                     "courseName": {
                         "type": "string",
@@ -2614,7 +2614,7 @@
                                     },
                                     "example": {
                                         "type": "string",
-                                        "example": "Course with ID CSE_101 already exists"
+                                        "example": "Course with ID CSE101 already exists"
                                     }
                                 }
                             },
