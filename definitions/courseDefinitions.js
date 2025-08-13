@@ -36,7 +36,7 @@ const courseDefinitions = {
     // --------------------------------------------------
     // Course input definition for creating a new course
     CourseInput: {
-        courseId: "CSE_110",
+        courseId: "CSE110",
         courseName: "Introduction to Computer Science",
         deptId: "CSEE",
         teacherId: "T001",

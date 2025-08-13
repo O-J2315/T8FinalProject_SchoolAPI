@@ -33,7 +33,7 @@ const teacherDefinitions = {
                 type: "array",
                 items: {
                     type: "string",
-                    description: "Course ID (e.g., CSE_110)",
+                    description: "Course ID (e.g., CSE110)",
                 },
                 description: "List of course IDs taught by the teacher",
             },

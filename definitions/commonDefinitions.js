@@ -76,7 +76,7 @@ const commonDefinitions = {
             },
             error: {
                 type: "string",
-                example: "Course with ID CSE_101 already exists",
+                example: "Course with ID CSE101 already exists",
             },
             conflictField: {
                 type: "string",

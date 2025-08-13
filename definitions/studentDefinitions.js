@@ -45,7 +45,7 @@ const studentDefinitions = {
                 type: "array",
                 items: {
                     type: "string",
-                    description: "Course ID (e.g., CSE_110)",
+                    description: "Course ID (e.g., CSE110)",
                 },
                 description: "List of course IDs enrolled by the student",
             },
@@ -64,7 +64,7 @@ const studentDefinitions = {
         status: "active",
         GPA: 3.5,
         enrollmentDate: "2023-01-01",
-        courses: ["CSE_110", "CSE_120"],
+        courses: ["CSE110", "CSE120"],
     },
 
     // R E S P O N S E / S
